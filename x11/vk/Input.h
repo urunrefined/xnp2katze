@@ -88,6 +88,10 @@ enum class KeyButtons : uint8_t {
     KEY_F12,
 
     KEY_SLASH,
+    KEY_SEMICOLON,
+    KEY_APOSTROPHE,
+    KEY_LEFT_BRACKET,
+    KEY_RIGHT_BRACKET,
 
     KEY_NUMPAD_PLUS,
     KEY_NUMPAD_MINUS,

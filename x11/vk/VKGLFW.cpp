@@ -129,6 +129,13 @@ static KeyMapping keymap[]{{GLFW_KEY_LEFT_SHIFT, KeyButtons::KEY_LEFT_SHIFT},
                            {GLFW_KEY_COMMA, KeyButtons::KEY_COMMA},
                            {GLFW_KEY_PERIOD, KeyButtons::KEY_PERIOD},
                            {GLFW_KEY_SLASH, KeyButtons::KEY_SLASH},
+                           {GLFW_KEY_SEMICOLON, KeyButtons::KEY_SEMICOLON},
+                           {GLFW_KEY_APOSTROPHE, KeyButtons::KEY_APOSTROPHE},
+                           {GLFW_KEY_LEFT_BRACKET, KeyButtons::KEY_LEFT_BRACKET},
+                           {GLFW_KEY_RIGHT_BRACKET, KeyButtons::KEY_RIGHT_BRACKET},
+                           
+                           
+                           
                            {GLFW_KEY_LEFT_SUPER, KeyButtons::KEY_SUPER},
                            {GLFW_KEY_ESCAPE, KeyButtons::KEY_ESC}};
 
