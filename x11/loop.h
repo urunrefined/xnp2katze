@@ -1,5 +1,4 @@
-#ifndef LOOP_H
-#define LOOP_H
+#pragma once
 
 #include "inputhandling.h"
 #include "np2.h"
@@ -12,4 +11,3 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
           Sfx::PulseSoundEngine &soundEngine);
 }
 
-#endif // LOOP_H

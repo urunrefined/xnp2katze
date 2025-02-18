@@ -1,5 +1,4 @@
-#ifndef VKDESCRIPTORSETEXT_H
-#define VKDESCRIPTORSETEXT_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -54,4 +53,3 @@ class VulkanDescriptorSetExt {
 
 } // namespace BR
 
-#endif // VKDESCRIPTORSETEXT_H

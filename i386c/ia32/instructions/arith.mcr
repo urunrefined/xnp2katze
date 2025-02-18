@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2004 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_ARITH_MCR__
-#define	IA32_CPU_ARITH_MCR__
 
 /* args == 1 */
 #define	ARITH_INSTRUCTION_1(inst) \
@@ -521,4 +521,3 @@ inst##_EdIx_ext(UINT32 madr, UINT32 src) \
 	cpu_vmemory_RMW_d(CPU_INST_SEGREG_INDEX, madr, inst##4, UINT32_TO_PTR(src)); \
 }
 
-#endif	/* IA32_CPU_ARITH_MCR__ */

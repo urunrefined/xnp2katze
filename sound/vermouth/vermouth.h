@@ -1,6 +1,4 @@
-
-#ifndef __VERMOUTH_H
-#define	__VERMOUTH_H
+#pragma once
 
 #ifndef VERMOUTHCL
 #define	VERMOUTHCL
@@ -63,5 +61,4 @@ VEXTERN int VEXPORT midimod_loadallex(MIDIMOD hdl, FNMIDIOUTLAEXCB cb, void *use
 }
 #endif
 
-#endif
 

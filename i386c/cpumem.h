@@ -1,5 +1,4 @@
-#ifndef	NP2_I386C_CPUMEM_H__
-#define	NP2_I386C_CPUMEM_H__
+#pragma once
 
 #include "common.h"
 
@@ -145,4 +144,3 @@ void MEMCALL memr_writes(UINT seg, UINT off, const void *dat, UINT leng);
 #define MEMR_WRITES(seg, off, dat, leng)	\
 			memr_writes((seg), (off), (dat), (leng))
 
-#endif	/* !NP2_I386C_CPUMEM_H__ */

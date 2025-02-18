@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -22,9 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef	IA32_CPU_INST_TABLE_H__
-#define	IA32_CPU_INST_TABLE_H__
 
 #include "compiler.h"
 
@@ -95,4 +94,3 @@ extern void (CPUCALL *insttable_G9[])(UINT32);
 }
 #endif
 
-#endif	/* IA32_CPU_INST_TABLE_H__ */

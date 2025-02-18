@@ -1,5 +1,4 @@
-#ifndef VKDESCRIPTORPOOLEXT_H
-#define VKDESCRIPTORPOOLEXT_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -19,4 +18,3 @@ class VulkanDescriptorPoolExt {
 
 } // namespace BR
 
-#endif // VKDESCRIPTORPOOLEXT_H

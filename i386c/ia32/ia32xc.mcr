@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_IA32XC_MCR__
-#define	IA32_CPU_IA32XC_MCR__
 
 #if defined(IA32_CROSS_CHECK) && defined(GCC_CPU_ARCH_IA32)
 
@@ -1706,5 +1706,3 @@ do { \
 #define	XC_STORE_FLAGL()
 
 #endif	/* IA32_CROSS_CHECK && GCC_CPU_ARCH_IA32 */
-
-#endif	/* IA32_CPU_IA32_MCR__ */

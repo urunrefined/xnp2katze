@@ -1,5 +1,4 @@
-#ifndef VKPIPELINE_H_
-#define VKPIPELINE_H_
+#pragma once
 
 #include "Array.h"
 #include <array>
@@ -226,4 +225,3 @@ createPipeline2(const VkDevice &device,
 
 } // namespace BR
 
-#endif

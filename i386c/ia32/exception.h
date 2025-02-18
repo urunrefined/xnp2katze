@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -22,9 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef	IA32_CPU_EXCEPTION_H__
-#define	IA32_CPU_EXCEPTION_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,4 +71,3 @@ void CPUCALL interrupt(int num, int intrtype, int errorp, int error_code);
 }
 #endif
 
-#endif	/* !IA32_CPU_EXCEPTION_H__ */

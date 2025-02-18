@@ -1,5 +1,4 @@
-#ifndef	NP2_X11_SCRNMNG_H__
-#define	NP2_X11_SCRNMNG_H__
+#pragma once
 
 #include "common.h"
 
@@ -32,4 +31,3 @@ void scrnmng_renewal();
 }
 #endif
 
-#endif	/* NP2_X11_SCRNMNG_H__ */

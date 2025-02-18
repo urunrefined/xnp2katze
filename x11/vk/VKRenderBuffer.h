@@ -1,5 +1,4 @@
-#ifndef VKRENDERBUFFER2_H
-#define VKRENDERBUFFER2_H
+#pragma once
 
 #include "VKCommandPool.h"
 #include "VKDevice.h"
@@ -25,4 +24,3 @@ class VulkanRenderBuffer {
 
 } // namespace BR
 
-#endif // VKRENDERBUFFER_H

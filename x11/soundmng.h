@@ -1,5 +1,4 @@
-#ifndef NP2_X11_SOUNGMNG_H__
-#define NP2_X11_SOUNGMNG_H__
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,4 +19,3 @@ void soundmng_reset(void *soundRef);
 } // #ifdef __cplusplus
 #endif
 
-#endif /* NP2_X11_SOUNGMNG_H__ */

@@ -1,5 +1,4 @@
-#ifndef VKFRAMEBUFFER_H
-#define VKFRAMEBUFFER_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -28,4 +27,3 @@ class VulkanFramebuffer {
 
 } // namespace BR
 
-#endif // VKFRAMEBUFFER_H

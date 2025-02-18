@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_IA32_MCR__
-#define	IA32_CPU_IA32_MCR__
 
 /*
  * misc
@@ -948,4 +948,3 @@ do { \
  */
 #include "ia32xc.mcr"
 
-#endif	/* IA32_CPU_IA32_MCR__ */

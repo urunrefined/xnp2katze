@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_INSTRUCTION_BIN_ARITH_H__
-#define	IA32_CPU_INSTRUCTION_BIN_ARITH_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -192,4 +192,3 @@ void CPUCALL CMP_EdIx_ext(UINT32, UINT32);
 }
 #endif
 
-#endif	/* IA32_CPU_INSTRUCTION_BIN_ARITH_H__ */

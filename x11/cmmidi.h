@@ -1,5 +1,4 @@
-#ifndef NP2_X11_CMMIDI_H__
-#define NP2_X11_CMMIDI_H__
+#pragma once
 
 // ---- com manager midi for unix
 
@@ -42,4 +41,3 @@ struct _commng *cmmidi_create(const char *midiout, const char *midiin,
 }
 #endif
 
-#endif /* NP2_X11_CMMIDI_H__ */

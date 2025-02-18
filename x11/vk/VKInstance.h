@@ -1,5 +1,4 @@
-#ifndef VKINSTANCE_H
-#define VKINSTANCE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -18,4 +17,3 @@ class VulkanInstance {
 
 } // namespace BR
 
-#endif // VKINSTANCE_H

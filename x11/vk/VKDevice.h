@@ -1,5 +1,4 @@
-#ifndef VKDEVICE_H
-#define VKDEVICE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -30,4 +29,3 @@ class VulkanDevice {
 
 } // namespace BR
 
-#endif // VKDEVICE_H

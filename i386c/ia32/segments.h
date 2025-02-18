@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -22,9 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef	IA32_CPU_SEGMENTS_H__
-#define	IA32_CPU_SEGMENTS_H__
 
 #include "compiler.h"
 
@@ -190,4 +189,3 @@ int CPUCALL selector_is_not_present(const selector_t *ssp);
 }
 #endif
 
-#endif	/* !IA32_CPU_SEGMENTS_H__ */

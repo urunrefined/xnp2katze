@@ -1,5 +1,4 @@
-#ifndef DISPLAYLIST_H
-#define DISPLAYLIST_H
+#pragma once
 
 #include "util/Matrix4x4.h"
 #include "VKTexture.h"
@@ -109,4 +108,3 @@ class TextDisplayList {
 
 } // namespace BR
 
-#endif // DISPLAYLIST_H

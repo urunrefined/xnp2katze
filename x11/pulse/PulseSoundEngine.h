@@ -1,5 +1,4 @@
-#ifndef PULSESOUNDENGINE_H_
-#define PULSESOUNDENGINE_H_
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -98,4 +97,3 @@ class PulseSoundEngine : public Runable {
 
 }} // namespace BR::Sfx
 
-#endif /* PULSESOUNDENGINE_H_ */

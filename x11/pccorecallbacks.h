@@ -1,5 +1,4 @@
-#ifndef PCCORECALLBACKS_H
-#define PCCORECALLBACKS_H
+#pragma once
 
 #include "vk/Input.h"
 #include "vk/VKTexture.h"
@@ -13,4 +12,3 @@ struct CallbackContext {
 
 } // namespace BR
 
-#endif // PCCORECALLBACKS_H

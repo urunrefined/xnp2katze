@@ -1,5 +1,4 @@
-#ifndef VKSURFACE_H
-#define VKSURFACE_H
+#pragma once
 
 #include "VKGLFW.h"
 
@@ -18,4 +17,3 @@ class VulkanSurface {
 
 } // namespace BR
 
-#endif // VKSURFACE_H

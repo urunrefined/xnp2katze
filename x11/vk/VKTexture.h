@@ -1,5 +1,4 @@
-#ifndef BR_VULKANTEXTURE_H
-#define BR_VULKANTEXTURE_H
+#pragma once
 
 #include "Image.h"
 #include "VKBuffers.h"
@@ -55,4 +54,3 @@ class VulkanTexture {
 
 } // namespace BR
 
-#endif // BR_VULKANTEXTURE_H

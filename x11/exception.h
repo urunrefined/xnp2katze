@@ -1,5 +1,4 @@
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#pragma once
 
 namespace BR {
 
@@ -20,4 +19,3 @@ class CException {
 
 } // namespace BR
 
-#endif // EXCEPTION_H

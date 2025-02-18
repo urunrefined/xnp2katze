@@ -1,5 +1,4 @@
-#ifndef THREAD_H
-#define THREAD_H
+#pragma once
 
 #include <pthread.h>
 
@@ -43,4 +42,3 @@ class LockGuard {
     ~LockGuard();
 };
 
-#endif // THREAD_H

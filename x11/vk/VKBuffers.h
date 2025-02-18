@@ -1,5 +1,4 @@
-#ifndef VKBUFFERS_H
-#define VKBUFFERS_H
+#pragma once
 
 #include "util/Range.h"
 #include <vulkan/vulkan.h>
@@ -65,4 +64,3 @@ class VulkanUniformBuffer : public VulkanCmbBuffer {
 
 } // namespace BR
 
-#endif // VKBUFFERS_H

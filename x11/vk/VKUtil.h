@@ -1,5 +1,4 @@
-#ifndef VKUTIL_H_
-#define VKUTIL_H_
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -43,4 +42,3 @@ bool getFirstGraphicsQueue(
 
 } // namespace BR
 
-#endif

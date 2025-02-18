@@ -1,5 +1,4 @@
-#ifndef VKIMAGEMEMORY_H
-#define VKIMAGEMEMORY_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -23,4 +22,3 @@ class VulkanImageMemory {
 
 } // namespace BR
 
-#endif // VKIMAGEMEMORY_H

@@ -1,5 +1,4 @@
-#ifndef VKPHYSICALDEVICE_H
-#define VKPHYSICALDEVICE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -27,4 +26,3 @@ class VulkanPhysicalDevice {
 
 } // namespace BR
 
-#endif // VKPHYSICALDEVICE_H

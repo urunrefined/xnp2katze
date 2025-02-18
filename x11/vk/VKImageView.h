@@ -1,5 +1,4 @@
-#ifndef VKIMAGEVIEW_H
-#define VKIMAGEVIEW_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -20,4 +19,3 @@ class VulkanImageView {
 };
 } // namespace BR
 
-#endif // VKIMAGEVIEW_H

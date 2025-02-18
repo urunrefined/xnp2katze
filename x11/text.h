@@ -1,5 +1,4 @@
-#ifndef TEXT_H
-#define TEXT_H
+#pragma once
 
 #include "vk/Displaylist.h"
 
@@ -60,4 +59,3 @@ class TextCache {
 
 } // namespace BR
 
-#endif // TEXT_H

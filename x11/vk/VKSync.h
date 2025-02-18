@@ -1,5 +1,4 @@
-#ifndef VKSYNC_H
-#define VKSYNC_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -57,4 +56,3 @@ class Sitter {
 
 } // namespace BR
 
-#endif // VKSYNC_H

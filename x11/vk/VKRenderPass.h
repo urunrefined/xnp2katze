@@ -1,5 +1,4 @@
-#ifndef VULKANRENDERPASS_H
-#define VULKANRENDERPASS_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -20,4 +19,3 @@ class VulkanRenderPass {
 
 } // namespace BR
 
-#endif // VULKANRENDERPASS_H

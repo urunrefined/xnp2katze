@@ -1,5 +1,4 @@
-#ifndef NP2_X11_DOSIO_H__
-#define NP2_X11_DOSIO_H__
+#pragma once
 
 #include "common.h"
 #include "compiler.h"
@@ -104,4 +103,3 @@ void file_setseparator(OEMCHAR *path, int maxlen);
 }
 #endif
 
-#endif /* NP2_X11_DOSIO_H__ */

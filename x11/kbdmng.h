@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NP2_X11_KBDMNG_H__
-#define NP2_X11_KBDMNG_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,3 @@ enum { KEYBOARD_KC_NC = 0xff };
 }
 #endif
 
-#endif /* NP2_X11_KBDMNG_H__ */

@@ -1,5 +1,4 @@
-#ifndef VKPHYSICALDEVICEENUMERATIONS_H
-#define VKPHYSICALDEVICEENUMERATIONS_H
+#pragma once
 
 #include "VKPhysicalDevice.h"
 
@@ -14,4 +13,3 @@ class VulkanPhysicalDeviceEnumerations {
 
 } // namespace BR
 
-#endif // VKPHYSICALDEVICEENUMERATIONS_H

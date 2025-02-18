@@ -1,5 +1,4 @@
-#ifndef VKPIPELINETEXEXT_H
-#define VKPIPELINETEXEXT_H
+#pragma once
 
 #include "VKRenderBuffer.h"
 #include "VKShaders.h"
@@ -30,4 +29,3 @@ class PipelineTexExt {
 
 } // namespace BR
 
-#endif // VKPIPELINETEXEXT_H

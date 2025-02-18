@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -22,9 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef	IA32_CPU_GROUPS_H__
-#define	IA32_CPU_GROUPS_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,4 +76,3 @@ void Grp9(void);
 }
 #endif
 
-#endif	/* IA32_CPU_GROUPS_H__ */

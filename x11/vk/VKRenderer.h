@@ -1,5 +1,4 @@
-#ifndef VKRENDERER_H_
-#define VKRENDERER_H_
+#pragma once
 
 #include "VKDescriptorSet.h"
 #include "VKDescriptorSetExt.h"
@@ -128,4 +127,3 @@ class VulkanRenderer {
 
 } // namespace BR
 
-#endif

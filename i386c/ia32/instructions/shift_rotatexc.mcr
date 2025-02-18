@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_INSTRUCTION_SHIFT_ROTATEXC_H__
-#define	IA32_CPU_INSTRUCTION_SHIFT_ROTATEXC_H__
 
 #define	XC_BYTE_SAR1(d, s) \
 do { \
@@ -2140,4 +2140,3 @@ do { \
 	} \
 } while (/*CONSTCOND*/ 0)
 
-#endif	/* IA32_CPU_INSTRUCTION_SHIFT_ROTATEXC_H__ */

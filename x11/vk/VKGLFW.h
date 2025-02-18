@@ -1,5 +1,4 @@
-#ifndef VKGLFW_H_
-#define VKGLFW_H_
+#pragma once
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -51,4 +50,3 @@ class GLFWContext {
 
 } // namespace BR
 
-#endif

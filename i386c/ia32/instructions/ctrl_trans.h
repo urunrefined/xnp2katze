@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_INSTRUCTION_CTRL_TRANS_H__
-#define	IA32_CPU_INSTRUCTION_CTRL_TRANS_H__
 
 #include "compiler.h"
 
@@ -152,4 +152,3 @@ void LEAVE(void);
 }
 #endif
 
-#endif	/* IA32_CPU_INSTRUCTION_CTRL_TRANS_H__ */

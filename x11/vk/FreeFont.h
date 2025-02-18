@@ -1,5 +1,4 @@
-#ifndef FREEFONT_H
-#define FREEFONT_H
+#pragma once
 
 #include <fcntl.h>
 #include <poll.h>
@@ -155,4 +154,3 @@ class Pen {
 
 } // namespace BR
 
-#endif // FREEFONT_H

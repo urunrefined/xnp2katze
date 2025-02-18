@@ -1,5 +1,4 @@
-#ifndef NP2_X11_TRACE_H__
-#define NP2_X11_TRACE_H__
+#pragma once
 
 #include <stddef.h>
 #include <stdio.h>
@@ -27,4 +26,3 @@ void hexdump(const uint8_t *buffer, size_t sz);
 }
 #endif
 
-#endif /* NP2_X11_TRACE_H__ */

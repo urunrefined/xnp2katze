@@ -1,5 +1,4 @@
-#ifndef VKPIPELINEV_H
-#define VKPIPELINEV_H
+#pragma once
 
 #include "VKRenderBuffer.h"
 #include "VKShaders.h"
@@ -26,4 +25,3 @@ class PipelineV {
 
 } // namespace BR
 
-#endif // VKPIPELINEV_H

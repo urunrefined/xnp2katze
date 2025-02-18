@@ -1,5 +1,4 @@
-#ifndef VKCOMMANDPOOL_H
-#define VKCOMMANDPOOL_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -22,4 +21,3 @@ class VulkanCommandPool {
 
 } // namespace BR
 
-#endif // VKCOMMANDPOOL_H

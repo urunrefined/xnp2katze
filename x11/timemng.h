@@ -1,5 +1,4 @@
-#ifndef NP2_X11_TIMEMNG_H__
-#define NP2_X11_TIMEMNG_H__
+#pragma once
 
 #include "common.h"
 #include "timing.h"
@@ -14,4 +13,3 @@ BRESULT timemng_gettime(_SYSTIME *systime);
 }
 #endif
 
-#endif /* NP2_X11_TIMEMNG_H__ */

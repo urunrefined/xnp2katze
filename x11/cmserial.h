@@ -1,5 +1,4 @@
-#ifndef NP2_X11_CMSERIAL_H__
-#define NP2_X11_CMSERIAL_H__
+#pragma once
 
 #include "commng.h"
 
@@ -21,4 +20,3 @@ struct _commng *cmserial_create(const char *tty);
 }
 #endif
 
-#endif /* NP2_X11_CMSERIAL_H__ */

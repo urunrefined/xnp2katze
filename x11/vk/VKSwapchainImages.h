@@ -1,5 +1,4 @@
-#ifndef VKSWAPCHAINIMAGES_H
-#define VKSWAPCHAINIMAGES_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -34,4 +33,3 @@ class VulkanSwapchainImages {
 
 } // namespace BR
 
-#endif // VKSWAPCHAINIMAGES_H

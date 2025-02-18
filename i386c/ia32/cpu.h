@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -31,8 +33,6 @@
 				Copyright by NONAKA Kimihiro 2002-2004
 */
 
-#ifndef IA32_CPU_CPU_H__
-#define IA32_CPU_CPU_H__
 
 #include "interface.h"
 #include "compiler.h"
@@ -790,4 +790,3 @@ char *cpu_disasm2str(UINT32 eip);
 #include "resolve.h"
 #include "task.h"
 
-#endif	/* !IA32_CPU_CPU_H__ */

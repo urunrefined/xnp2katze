@@ -1,5 +1,4 @@
-#ifndef NP2_X11_FONTMNG_H__
-#define NP2_X11_FONTMNG_H__
+#pragma once
 
 #include "common.h"
 #include "rect.h"
@@ -37,4 +36,3 @@ FNTDAT fontmng_get(void *hdl, const char *string);
 }
 #endif
 
-#endif /* NP2_X11_FONTMNG_H__ */

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_TASK_H__
-#define	IA32_CPU_TASK_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,4 +48,3 @@ void CPUCALL task_switch(selector_t *selector, task_switch_type_t type);
 }
 #endif
 
-#endif	/* !IA32_CPU_TASK_H__ */

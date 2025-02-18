@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2004 NONAKA Kimihiro
  * All rights reserved.
@@ -22,9 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef	IA32_CPU_CPU_MEM_H__
-#define	IA32_CPU_CPU_MEM_H__
 
 #include "cpumem.h"
 #include "segments.h"
@@ -85,4 +84,3 @@ void MEMCALL cpu_memorywrite_f(UINT32 paddr, const REG80 *value);
 }
 #endif
 
-#endif	/* !IA32_CPU_CPU_MEM_H__ */

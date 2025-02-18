@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2002-2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_RESOLVE_H__
-#define	IA32_CPU_RESOLVE_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +49,3 @@ calc_ea_dst(UINT32 op)
 }
 #endif
 
-#endif	/* IA32_CPU_RESOLVE_H__ */

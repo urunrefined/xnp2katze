@@ -1,5 +1,4 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -18,4 +17,3 @@ class Image {
 
 } // namespace BR
 
-#endif // IMAGE_H

@@ -1,5 +1,4 @@
-#ifndef VKCOMMANDBUFFER_H
-#define VKCOMMANDBUFFER_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -24,4 +23,3 @@ class VulkanCommandBuffer {
 
 } // namespace BR
 
-#endif // VKCOMMANDBUFFER_H

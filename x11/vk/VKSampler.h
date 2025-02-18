@@ -1,5 +1,4 @@
-#ifndef VKTEXTURESAMPLER_H
-#define VKTEXTURESAMPLER_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -22,4 +21,3 @@ class VulkanSampler {
 };
 } // namespace BR
 
-#endif // VKSAMPLER_H

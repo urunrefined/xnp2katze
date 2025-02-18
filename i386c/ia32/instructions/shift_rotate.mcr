@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_SHIFT_ROTATE_MCR__
-#define	IA32_CPU_SHIFT_ROTATE_MCR__
 
 /*
  * shift/rorate instruction macro
@@ -1078,4 +1078,3 @@ do { \
 
 #endif	/* IA32_CROSS_CHECK && GCC_CPU_ARCH_IA32 */
 
-#endif	/* IA32_CPU_SHIFT_ROTATE_MCR__ */

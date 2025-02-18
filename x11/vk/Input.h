@@ -1,5 +1,4 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <algorithm>
 #include <array>
@@ -207,5 +206,3 @@ class Input {
 };
 
 } // namespace BR
-
-#endif // INPUT_H

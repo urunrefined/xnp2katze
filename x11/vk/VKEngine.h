@@ -1,5 +1,4 @@
-#ifndef VKENGINE_H
-#define VKENGINE_H
+#pragma once
 
 #include "VKBuffers.h"
 #include "VKCommandPool.h"
@@ -168,4 +167,3 @@ class VulkanScaler {
 
 } // namespace BR
 
-#endif // VKENGINE_H

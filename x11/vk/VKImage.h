@@ -1,5 +1,4 @@
-#ifndef VKIMAGE_H
-#define VKIMAGE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -20,4 +19,3 @@ class VulkanImage {
 
 } // namespace BR
 
-#endif // VKIMAGE_H

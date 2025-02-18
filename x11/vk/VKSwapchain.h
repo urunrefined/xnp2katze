@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vulkan/vulkan.h>
 
 #include "VKFramebuffer.h"
@@ -6,8 +8,6 @@
 #include <memory>
 #include <vector>
 
-#ifndef VKSWAPCHAIN_H
-#define VKSWAPCHAIN_H
 
 namespace BR {
 
@@ -76,4 +76,3 @@ class VulkanSwapchain {
 
 } // namespace BR
 
-#endif

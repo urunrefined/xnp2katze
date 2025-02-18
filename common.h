@@ -1,5 +1,4 @@
-#ifndef	NP2_COMMON_H__
-#define	NP2_COMMON_H__
+#pragma once
 
 #include "compiler.h"
 
@@ -148,4 +147,3 @@ enum {
 #define	FASTCALL
 #endif
 
-#endif

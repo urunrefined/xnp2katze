@@ -1,6 +1,5 @@
-#ifndef VKDESCRIPTORPOOL_H
-#define VKDESCRIPTORPOOL_H
-
+#pragma once
+ 
 #include <vulkan/vulkan.h>
 
 namespace BR {
@@ -17,4 +16,3 @@ class VulkanDescriptorPool {
 
 } // namespace BR
 
-#endif // VKDESCRIPTORPOOL_H

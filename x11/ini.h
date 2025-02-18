@@ -1,5 +1,4 @@
-#ifndef NP2_X11_INI_H__
-#define NP2_X11_INI_H__
+#pragma once
 
 #include "compiler.h"
 
@@ -60,4 +59,3 @@ void initsave(const char *path, const char *iniTitle, INITBL *tbl, size_t size);
 }
 #endif
 
-#endif /* NP2_X11_INI_H__ */

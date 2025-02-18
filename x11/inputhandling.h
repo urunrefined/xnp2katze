@@ -1,5 +1,4 @@
-#ifndef INPUTHANDLING_H
-#define INPUTHANDLING_H
+#pragma once
 
 #include "enums.h"
 #include "keystat.h"
@@ -31,4 +30,3 @@ void saveKeyMap(const char *filename,
 
 } // namespace BR
 
-#endif // INPUTHANDLING_H

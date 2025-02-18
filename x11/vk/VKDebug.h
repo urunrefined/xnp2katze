@@ -1,5 +1,4 @@
-#ifndef VKDEBUG_H
-#define VKDEBUG_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -21,4 +20,3 @@ class VulkanDebugCallback {
 
 } // namespace BR
 
-#endif // VKDEBUG_H

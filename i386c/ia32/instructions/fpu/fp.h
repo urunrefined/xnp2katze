@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2003 NONAKA Kimihiro
  * All rights reserved.
@@ -23,9 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	IA32_CPU_INSTRUCTION_FPU_FP_H__
-#define	IA32_CPU_INSTRUCTION_FPU_FP_H__
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,4 +46,3 @@ void ESC7(void);
 }
 #endif
 
-#endif	/* IA32_CPU_INSTRUCTION_FPU_FP_H__ */

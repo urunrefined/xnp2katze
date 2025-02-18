@@ -1,5 +1,4 @@
-#ifndef VKSHADERS_H_
-#define VKSHADERS_H_
+#pragma once
 
 #include <vector>
 
@@ -37,4 +36,3 @@ class ShaderStore {
 
 } // namespace BR
 
-#endif

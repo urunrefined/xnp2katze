@@ -1,5 +1,4 @@
-#ifndef NP2_X11_NP2_H__
-#define NP2_X11_NP2_H__
+#pragma once
 
 #include "compiler.h"
 #include <signal.h>
@@ -55,4 +54,3 @@ int mainloop(void *graphics, void *soundRef);
 }
 #endif
 
-#endif /* NP2_X11_NP2_H__ */
