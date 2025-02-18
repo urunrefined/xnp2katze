@@ -126,4 +126,3 @@ class VulkanRenderer {
 };
 
 } // namespace BR
-

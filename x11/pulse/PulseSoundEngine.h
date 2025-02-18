@@ -96,4 +96,3 @@ class PulseSoundEngine : public Runable {
 };
 
 }} // namespace BR::Sfx
-

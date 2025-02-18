@@ -25,7 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,4 +36,3 @@ enum { KEYBOARD_KC_NC = 0xff };
 #ifdef __cplusplus
 }
 #endif
-

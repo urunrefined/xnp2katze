@@ -41,4 +41,3 @@ bool getFirstGraphicsQueue(
     const std::vector<VkQueueFamilyProperties> &queueFamilies);
 
 } // namespace BR
-

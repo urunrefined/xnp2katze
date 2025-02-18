@@ -35,4 +35,3 @@ class ShaderStore {
 };
 
 } // namespace BR
-

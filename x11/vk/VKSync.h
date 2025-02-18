@@ -55,4 +55,3 @@ class Sitter {
 };
 
 } // namespace BR
-

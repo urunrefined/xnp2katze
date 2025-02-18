@@ -11,4 +11,3 @@ class IniCfg {
 
     IniCfg(NP2OSCFG &np2oscfg, tagNP2Config &np2cfg);
 };
-

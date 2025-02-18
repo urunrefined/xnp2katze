@@ -23,4 +23,3 @@ class VulkanRenderBuffer {
 };
 
 } // namespace BR
-

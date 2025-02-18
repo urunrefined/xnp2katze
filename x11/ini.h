@@ -58,4 +58,3 @@ void initsave(const char *path, const char *iniTitle, INITBL *tbl, size_t size);
 #ifdef __cplusplus
 }
 #endif
-

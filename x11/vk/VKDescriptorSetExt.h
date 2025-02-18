@@ -2,9 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
-#include "util/Matrix4x4.h"
 #include "VKBuffers.h"
 #include "VKPhysicalDevice.h"
+#include "util/Matrix4x4.h"
 
 namespace BR {
 
@@ -52,4 +52,3 @@ class VulkanDescriptorSetExt {
 };
 
 } // namespace BR
-

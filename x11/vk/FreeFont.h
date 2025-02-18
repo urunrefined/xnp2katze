@@ -153,4 +153,3 @@ class Pen {
 };
 
 } // namespace BR
-

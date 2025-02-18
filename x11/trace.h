@@ -25,4 +25,3 @@ void hexdump(const uint8_t *buffer, size_t sz);
 #ifdef __cplusplus
 }
 #endif
-

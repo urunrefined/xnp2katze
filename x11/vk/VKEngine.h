@@ -166,4 +166,3 @@ class VulkanScaler {
 };
 
 } // namespace BR
-

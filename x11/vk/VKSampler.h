@@ -20,4 +20,3 @@ class VulkanSampler {
     operator VkSampler &() { return sampler; }
 };
 } // namespace BR
-

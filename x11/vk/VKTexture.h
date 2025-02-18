@@ -53,4 +53,3 @@ class VulkanTexture {
 };
 
 } // namespace BR
-

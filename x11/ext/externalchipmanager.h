@@ -28,7 +28,7 @@ class CExternalChipManager {
 
   private:
     static CExternalChipManager sm_instance; /*!< 唯一のインスタンスです */
-    std::vector<IExternalChip *> m_chips; /*!< モジュール */
+    std::vector<IExternalChip *> m_chips;    /*!< モジュール */
 
     C86CtlIf m_c86ctl; /*!< C86Ctl インスタンス */
     CScciIf m_scci;    /*!< SCCI インスタンス */

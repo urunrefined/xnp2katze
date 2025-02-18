@@ -25,4 +25,3 @@ class VulkanPhysicalDevice {
 };
 
 } // namespace BR
-

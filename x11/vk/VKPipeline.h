@@ -224,4 +224,3 @@ createPipeline2(const VkDevice &device,
 }
 
 } // namespace BR
-

@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-
 namespace BR {
 
 class VulkanSwapchain {
@@ -75,4 +74,3 @@ class VulkanSwapchain {
 };
 
 } // namespace BR
-

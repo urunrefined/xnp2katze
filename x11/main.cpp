@@ -41,8 +41,8 @@
 #include "parts.h"
 #include "pccore.h"
 #include "s98.h"
-#include "util/SignalFD.h"
 #include "soundmng.h"
+#include "util/SignalFD.h"
 
 #include <getopt.h>
 #include <locale.h>
@@ -210,7 +210,7 @@ static void go(int argc, char *argv[]) {
     if (help) {
         usage(progName.c_str());
     }
-    
+
     std::string homeDir = discoverHomeDir();
     std::string xnp2Dir = discoverXnp2Dir(homeDir);
     std::string configDir = discoverConfigDir(xnp2Dir);
@@ -327,7 +327,9 @@ static void go(int argc, char *argv[]) {
                 printf("Cannot ready disk %s\n", diskname.c_str());
                 return;
             }
-            { printf("Ready Disk %s\n", diskname.c_str()); }
+            {
+                printf("Ready Disk %s\n", diskname.c_str());
+            }
 
             diskdrv_readyfdd(i, diskname.c_str(), 0);
         }

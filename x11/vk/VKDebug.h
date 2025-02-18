@@ -19,4 +19,3 @@ class VulkanDebugCallback {
 };
 
 } // namespace BR
-

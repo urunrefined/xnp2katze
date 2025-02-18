@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util/Matrix4x4.h"
 #include "VKTexture.h"
+#include "util/Matrix4x4.h"
 #include "util/Vertex.h"
 #include "vk/FreeFont.h"
 #include "vk/VKDescriptorPoolExt.h"
@@ -107,4 +107,3 @@ class TextDisplayList {
 };
 
 } // namespace BR
-

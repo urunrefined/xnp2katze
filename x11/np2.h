@@ -53,4 +53,3 @@ int mainloop(void *graphics, void *soundRef);
 #ifdef __cplusplus
 }
 #endif
-

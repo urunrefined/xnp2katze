@@ -6,8 +6,6 @@
 
 #include "pulse/PulseSoundEngine.h"
 
-#include "util/Matrix4x4.h"
-#include "util/Vertex.h"
 #include "exception.h"
 #include "inputhandling.h"
 #include "loop.h"
@@ -15,6 +13,8 @@
 #include "pccore.h"
 #include "pccorecallbacks.h"
 #include "text.h"
+#include "util/Matrix4x4.h"
+#include "util/Vertex.h"
 
 namespace BR {
 

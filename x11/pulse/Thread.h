@@ -41,4 +41,3 @@ class LockGuard {
     LockGuard(Mutex &mutex_);
     ~LockGuard();
 };
-

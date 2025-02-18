@@ -29,4 +29,3 @@ void saveKeyMap(const char *filename,
                 const std::vector<KeyMappingNew> &mapping);
 
 } // namespace BR
-

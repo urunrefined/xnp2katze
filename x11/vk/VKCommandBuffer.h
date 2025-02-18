@@ -22,4 +22,3 @@ class VulkanCommandBuffer {
 };
 
 } // namespace BR
-

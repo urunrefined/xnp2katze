@@ -63,4 +63,3 @@ class VulkanUniformBuffer : public VulkanCmbBuffer {
 };
 
 } // namespace BR
-

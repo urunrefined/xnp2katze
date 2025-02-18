@@ -26,4 +26,3 @@ class PipelineTex {
 };
 
 } // namespace BR
-

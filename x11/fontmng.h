@@ -35,4 +35,3 @@ FNTDAT fontmng_get(void *hdl, const char *string);
 #ifdef __cplusplus
 }
 #endif
-

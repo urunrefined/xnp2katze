@@ -102,4 +102,3 @@ void file_setseparator(OEMCHAR *path, int maxlen);
 #ifdef __cplusplus
 }
 #endif
-

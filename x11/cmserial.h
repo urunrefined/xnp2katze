@@ -19,4 +19,3 @@ struct _commng *cmserial_create(const char *tty);
 #ifdef __cplusplus
 }
 #endif
-

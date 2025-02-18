@@ -32,4 +32,3 @@ class VulkanSwapchainImages {
 };
 
 } // namespace BR
-

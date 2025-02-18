@@ -18,4 +18,3 @@ class CException {
 };
 
 } // namespace BR
-

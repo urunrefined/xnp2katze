@@ -58,4 +58,3 @@ class TextCache {
 };
 
 } // namespace BR
-

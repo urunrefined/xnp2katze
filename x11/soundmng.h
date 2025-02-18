@@ -18,4 +18,3 @@ void soundmng_reset(void *soundRef);
 #ifdef __cplusplus
 } // #ifdef __cplusplus
 #endif
-

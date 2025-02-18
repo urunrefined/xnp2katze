@@ -21,4 +21,3 @@ class VulkanImageMemory {
 };
 
 } // namespace BR
-

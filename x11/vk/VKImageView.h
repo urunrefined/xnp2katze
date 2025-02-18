@@ -18,4 +18,3 @@ class VulkanImageView {
     operator VkImageView &() { return imageView; }
 };
 } // namespace BR
-

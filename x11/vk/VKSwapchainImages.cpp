@@ -1,7 +1,7 @@
 #include "VKSwapchainImages.h"
 
-#include "util/Bitset.h"
 #include "VKUtil.h"
+#include "util/Bitset.h"
 
 #include <array>
 #include <limits>

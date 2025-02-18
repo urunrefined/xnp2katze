@@ -1,5 +1,5 @@
 #pragma once
- 
+
 #include <vulkan/vulkan.h>
 
 namespace BR {
@@ -15,4 +15,3 @@ class VulkanDescriptorPool {
 };
 
 } // namespace BR
-

@@ -18,4 +18,3 @@ class VulkanRenderPass {
 };
 
 } // namespace BR
-

@@ -12,4 +12,3 @@ class VulkanPhysicalDeviceEnumerations {
 };
 
 } // namespace BR
-

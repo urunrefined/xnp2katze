@@ -40,4 +40,3 @@ struct _commng *cmmidi_create(const char *midiout, const char *midiin,
 #ifdef __cplusplus
 }
 #endif
-

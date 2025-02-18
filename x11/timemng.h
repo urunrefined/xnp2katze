@@ -12,4 +12,3 @@ BRESULT timemng_gettime(_SYSTIME *systime);
 #ifdef __cplusplus
 }
 #endif
-

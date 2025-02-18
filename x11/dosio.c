@@ -15,7 +15,7 @@
 static OEMCHAR curpath[MAX_PATH] = {};
 static OEMCHAR *curfilep = curpath;
 
-#define ISKANJI(c) ((((c)-0xa1) & 0xff) < 0x5c)
+#define ISKANJI(c) ((((c) - 0xa1) & 0xff) < 0x5c)
 
 /* ファイル操作 */
 FILEH

@@ -76,7 +76,7 @@ typedef signed long nxp2ptr;
 #define FillMemory(a, b, c) memset((a), (c), (b))
 
 #ifndef roundup
-#define roundup(x, y) ((((x) + ((y)-1)) / (y)) * (y))
+#define roundup(x, y) ((((x) + ((y) - 1)) / (y)) * (y))
 #endif
 
 #ifndef NELEMENTS

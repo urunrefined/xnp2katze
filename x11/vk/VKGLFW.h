@@ -49,4 +49,3 @@ class GLFWContext {
 };
 
 } // namespace BR
-
