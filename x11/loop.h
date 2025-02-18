@@ -5,7 +5,7 @@
 #include "np2.h"
 #include "pccore.h"
 #include "pulse/PulseSoundEngine.h"
-#include "signalFD.h"
+#include "util/SignalFD.h"
 
 namespace BR {
 void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,

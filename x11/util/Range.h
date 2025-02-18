@@ -1,5 +1,4 @@
-#ifndef RANGE_H
-#define RANGE_H
+#pragma once
 
 #include <algorithm>
 #include <stdint.h>
@@ -19,5 +18,3 @@ class Ranges {
 };
 
 } // namespace BR
-
-#endif // RANGE_H

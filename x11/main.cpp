@@ -41,7 +41,7 @@
 #include "parts.h"
 #include "pccore.h"
 #include "s98.h"
-#include "signalFD.h"
+#include "util/SignalFD.h"
 #include "soundmng.h"
 
 #include <getopt.h>
@@ -210,7 +210,7 @@ static void go(int argc, char *argv[]) {
     if (help) {
         usage(progName.c_str());
     }
-
+    
     std::string homeDir = discoverHomeDir();
     std::string xnp2Dir = discoverXnp2Dir(homeDir);
     std::string configDir = discoverConfigDir(xnp2Dir);
@@ -351,6 +351,7 @@ static void go(int argc, char *argv[]) {
  * main
  */
 int main(int argc, char *argv[]) {
+
     try {
         go(argc, argv);
     } catch (BR::Exception &ex) {

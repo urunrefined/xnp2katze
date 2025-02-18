@@ -1,5 +1,4 @@
-#ifndef BITSET_H_
-#define BITSET_H_
+#pragma once
 
 #include <assert.h>
 #include <stddef.h>
@@ -43,4 +42,3 @@ template <size_t T1> class Bitset {
 };
 
 } // namespace BR
-#endif

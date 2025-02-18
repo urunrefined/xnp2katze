@@ -1,5 +1,4 @@
-#ifndef MATRIX4X4_H_
-#define MATRIX4X4_H_
+#pragma once
 
 #include "Vertex.h"
 #include <cmath>
@@ -67,5 +66,3 @@ class Matrix4x4f {
 };
 
 } // namespace BR
-
-#endif /* MATRIX4X4_H_ */

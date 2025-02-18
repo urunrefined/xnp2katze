@@ -1,6 +1,6 @@
 #include "VKDescriptorSetExt.h"
-#include "Core.h"
-#include "Matrix4x4.h"
+#include "util/Core.h"
+#include "util/Matrix4x4.h"
 
 #include <stdexcept>
 #include <string.h>

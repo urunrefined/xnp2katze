@@ -1,15 +1,16 @@
-#ifndef SIGNALFD_H
-#define SIGNALFD_H
+#pragma once
 
 #include <signal.h>
 
 namespace BR {
 
 class SignalBlock {
+    bool unblockOnDestruction;
+
   public:
     sigset_t mask;
 
-    SignalBlock();
+    SignalBlock(bool unblockOnDestruction_);
     ~SignalBlock();
 };
 
@@ -24,5 +25,3 @@ class SignalFD {
 };
 
 } // namespace BR
-
-#endif // SIGNALFD_H

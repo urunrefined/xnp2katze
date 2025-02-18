@@ -3,7 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Matrix4x4.h"
+#include "util/Matrix4x4.h"
 #include "VKBuffers.h"
 #include "VKPhysicalDevice.h"
 

@@ -6,8 +6,8 @@
 
 #include "pulse/PulseSoundEngine.h"
 
-#include "Matrix4x4.h"
-#include "Vertex.h"
+#include "util/Matrix4x4.h"
+#include "util/Vertex.h"
 #include "exception.h"
 #include "inputhandling.h"
 #include "loop.h"

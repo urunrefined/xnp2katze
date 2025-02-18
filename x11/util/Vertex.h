@@ -1,5 +1,4 @@
-#ifndef VERTICES_H
-#define VERTICES_H
+#pragma once
 
 #include <iomanip>
 #include <iostream>
@@ -85,5 +84,3 @@ using Color3D = Vec3;
 using Color4D = Vec4;
 
 } // namespace BR
-
-#endif // VERTICES_H

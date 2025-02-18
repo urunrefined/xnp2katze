@@ -1,6 +1,6 @@
 #include "VKSwapchainImages.h"
 
-#include "Bitset.h"
+#include "util/Bitset.h"
 #include "VKUtil.h"
 
 #include <array>

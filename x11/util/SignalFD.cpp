@@ -1,4 +1,4 @@
-#include "signalFD.h"
+#include "SignalFD.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -7,27 +7,30 @@
 #include <sys/signalfd.h>
 #include <unistd.h>
 
-#include "exception.h"
-
 namespace BR {
 
-SignalBlock::SignalBlock() {
+SignalBlock::SignalBlock(bool unblockOnDestruction_)
+    : unblockOnDestruction(unblockOnDestruction_) {
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);
     sigaddset(&mask, SIGQUIT);
 
     if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1) {
-        throw CException("sigprocmask failed", errno);
+        throw "sigprocmask failed";
     }
 };
 
-SignalBlock::~SignalBlock() { sigprocmask(SIG_UNBLOCK, &mask, NULL); };
+SignalBlock::~SignalBlock() {
+    if (unblockOnDestruction) {
+        sigprocmask(SIG_UNBLOCK, &mask, NULL);
+    }
+};
 
-SignalFD::SignalFD() {
+SignalFD::SignalFD() : block(false) {
     sfd = signalfd(-1, &(block.mask), O_CLOEXEC);
 
     if (sfd == -1) {
-        throw CException("signalfd failed", errno);
+        throw "signalfd failed";
     }
 }
 

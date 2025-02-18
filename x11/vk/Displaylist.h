@@ -1,9 +1,9 @@
 #ifndef DISPLAYLIST_H
 #define DISPLAYLIST_H
 
-#include "Matrix4x4.h"
+#include "util/Matrix4x4.h"
 #include "VKTexture.h"
-#include "Vertex.h"
+#include "util/Vertex.h"
 #include "vk/FreeFont.h"
 #include "vk/VKDescriptorPoolExt.h"
 

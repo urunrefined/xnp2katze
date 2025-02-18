@@ -1,5 +1,4 @@
-#ifndef ARRAYVIEW_H_
-#define ARRAYVIEW_H_
+#pragma once
 
 #include <assert.h>
 #include <unistd.h>
@@ -42,5 +41,3 @@ template <class T1, size_t size> ArrayView<T1> makeArray(T1 (&elements)[size]) {
 }
 
 } // Namespace BR
-
-#endif // ARRAYVIEW_H_

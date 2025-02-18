@@ -208,7 +208,6 @@ SRC_CPP = \
 		x11/exception.cpp                              \
 		x11/pccorecallbacks.cpp                        \
 		x11/inputhandling.cpp                          \
-		x11/signalFD.cpp                               \
 		x11/soundmng.cpp                               \
 		x11/pulse/PulseSoundEngine.cpp                 \
 		x11/pulse/Thread.cpp                           \
@@ -267,9 +266,10 @@ SRC_CPP = \
 		x11/vk/Displaylist.cpp                         \
 		x11/vk/FreeFont.cpp                            \
 		x11/vk/Image.cpp                               \
-		x11/vk/Vertex.cpp                              \
-		x11/vk/Matrix4x4.cpp                           \
-		x11/vk/Range.cpp
+		x11/util/Vertex.cpp                            \
+		x11/util/Matrix4x4.cpp                         \
+		x11/util/Range.cpp                             \
+		x11/util/SignalFD.cpp
 		
 
 ifeq ($(VKDEBUG),1)
@@ -309,7 +309,11 @@ $(BIN): $(OBJ)
 
 .PHONY: clean
 
+GEN_OBJ = $(shell find . -name '*.o')
+GEN_DEP = $(shell find . -name '*.d')
+GEN_SHADER = $(shell find . -name '*.spv')
+
 clean:
-	$(RM) $(OBJ) $(DEP) $(BIN) $(FRAGSHADEROBJ) $(VERTSHADEROBJ)
+	$(RM) $(GEN_OBJ) $(GEN_DEP) $(GEN_SHADER) $(BIN)
 
 -include $(DEP)

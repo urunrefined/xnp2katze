@@ -1,6 +1,6 @@
 #include "VKPipelineTexExt.h"
-#include "Core.h"
-#include "Vertex.h"
+#include "util/Core.h"
+#include "util/Vertex.h"
 
 namespace BR {
 
