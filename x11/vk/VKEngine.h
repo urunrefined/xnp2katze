@@ -4,14 +4,14 @@
 #include "VKCommandPool.h"
 #include "VKDebug.h"
 #include "VKDevice.h"
-#include "VKGLFW.h"
+#include "glfw/VKGLFW.h"
 #include "VKInstance.h"
 #include "VKPhysicalDevice.h"
 #include "VKRenderBuffer.h"
 #include "VKRenderPass.h"
 #include "VKRenderer.h"
 #include "VKShaders.h"
-#include "VKSurface.h"
+#include "glfw/VKSurface.h"
 #include "VKSwapchain.h"
 #include "VKSwapchainImages.h"
 #include "VKSync.h"
@@ -28,12 +28,6 @@ class VulkanContext {
     VulkanSurface surface;
 
     VulkanContext(bool enableValidationLayers);
-};
-
-enum class WindowState {
-    SHOULDCLOSE = 0,
-    MINIMIZED,
-    FOCUSED,
 };
 
 enum class RenderState {

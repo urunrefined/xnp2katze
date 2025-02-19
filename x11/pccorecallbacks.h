@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vk/Input.h"
+#include "glfw/Input.h"
 #include "vk/VKTexture.h"
 
 namespace BR {

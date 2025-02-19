@@ -86,6 +86,9 @@ enum class KeyButtons : uint8_t {
     KEY_F11,
     KEY_F12,
 
+    KEY_PAGE_UP,
+    KEY_PAGE_DOWN,
+
     KEY_SLASH,
     KEY_SEMICOLON,
     KEY_APOSTROPHE,

@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "VKGLFW.h"
+#include "glfw/VKGLFW.h"
 
 namespace BR {
 

@@ -230,15 +230,15 @@ SRC_CPP = \
 		x11/ext/externalopm.cpp                        \
 		x11/ext/externalopna.cpp                       \
 		x11/ext/externalpsg.cpp                        \
-		x11/vk/Input.cpp                               \
-		x11/vk/VKGLFW.cpp                              \
+		x11/glfw/Input.cpp                             \
+		x11/glfw/VKGLFW.cpp                            \
+		x11/glfw/VKSurface.cpp                         \
 		x11/vk/VKInstance.cpp                          \
 		x11/vk/VKDebug.cpp                             \
 		x11/vk/VKPhysicalDevice.cpp                    \
 		x11/vk/VKCommandPool.cpp                       \
 		x11/vk/VKEngine.cpp                            \
 		x11/vk/VKUtil.cpp                              \
-		x11/vk/VKSurface.cpp                           \
 		x11/vk/VKDevice.cpp                            \
 		x11/vk/VKImage.cpp                             \
 		x11/vk/VKImageView.cpp                         \

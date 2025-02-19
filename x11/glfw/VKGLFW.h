@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Input.h"
+#include "util/Rect.h"
 
 namespace BR {
 
@@ -20,9 +21,18 @@ class GLFWInput : public Input {
         }
     };
 
+    std::vector<uint32_t> codepoints;
+
+    void reset() {
+        codepoints.clear();
+        Input::reset();
+    }
+
     GLFWInput() : window(nullptr), shouldClose(false) {}
     virtual ~GLFWInput() {}
 };
+
+enum class WindowState { SHOULDCLOSE = 0, MINIMIZED, FOCUSED };
 
 class GLFWContext {
   public:
@@ -45,7 +55,23 @@ class GLFWContext {
 
     GLFWInput input;
 
+    Dimensions2D getCurrentSize();
+
     GLFWInput &getInput();
+
+    void wait(double timeout);
+    void wait();
+
+    void pollWindowEvents() { glfwPollEvents(); }
+
+    WindowState getWindowState() {
+        if (glfwWindowShouldClose(window)) {
+            return WindowState::SHOULDCLOSE;
+        }
+        return WindowState::FOCUSED;
+    }
 };
+
+std::vector<const char *> getRequiredGLFWExtensions();
 
 } // namespace BR

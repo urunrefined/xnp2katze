@@ -121,6 +121,9 @@ static KeyMapping keymap[]{
     {GLFW_KEY_NUM_LOCK, KeyButtons::KEY_NUMPAD_NUM},
     {GLFW_KEY_KP_DECIMAL, KeyButtons::KEY_NUMPAD_COMMA},
 
+    {GLFW_KEY_PAGE_UP, KeyButtons::KEY_PAGE_UP},
+    {GLFW_KEY_PAGE_DOWN, KeyButtons::KEY_PAGE_DOWN},
+
     {GLFW_KEY_LEFT, KeyButtons::KEY_ARROW_LEFT},
     {GLFW_KEY_UP, KeyButtons::KEY_ARROW_UP},
     {GLFW_KEY_RIGHT, KeyButtons::KEY_ARROW_RIGHT},
@@ -265,6 +268,14 @@ static void scroll_callback(GLFWwindow *window, double xoffset,
     }
 }
 
+static void charCallback(GLFWwindow *window, unsigned int codepoint) {
+    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWInput &input = ctx->input;
+
+    // add utf8
+    input.codepoints.push_back((uint32_t)codepoint);
+}
+
 GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
     : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
     glfwInit();
@@ -278,7 +289,7 @@ GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
                               nullptr, nullptr);
 
     if (!window) {
-        throw std::runtime_error("Could not create GLFW window!");
+        throw "Could not create GLFW window!";
     }
 
     glfwSetWindowUserPointer(window, this);
@@ -288,6 +299,7 @@ GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetCharCallback(window, charCallback);
 
     onWindowResized(window, surfaceWidth, surfaceHeight);
 
@@ -299,6 +311,29 @@ GLFWContext::~GLFWContext() {
     glfwTerminate();
 }
 
+Dimensions2D GLFWContext::getCurrentSize() {
+    return {currentWidth, currentHeight};
+}
+
+void GLFWContext::wait(double timeout) { glfwWaitEventsTimeout(timeout); }
+
+void GLFWContext::wait() { glfwWaitEvents(); }
+
 GLFWInput &GLFWContext::getInput() { return input; }
+
+std::vector<const char *> getRequiredGLFWExtensions() {
+    std::vector<const char *> extensions;
+
+    uint32_t glfwExtensionCount = 0;
+    const char **glfwExtensions;
+    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    for (uint32_t i = 0; i < glfwExtensionCount; i++) {
+        printf("GLFW requires extension %s\n", glfwExtensions[i]);
+        extensions.push_back(glfwExtensions[i]);
+    }
+
+    return extensions;
+}
 
 } // namespace BR
