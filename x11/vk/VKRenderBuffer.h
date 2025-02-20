@@ -2,24 +2,26 @@
 
 #include "VKCommandPool.h"
 #include "VKDevice.h"
+#include "VKFramebuffer.h"
 #include "VKRenderPass.h"
-#include "VKSwapchain.h"
+#include <memory>
 
 namespace BR {
 
 class VulkanRenderBuffer {
   public:
-    const VulkanDevice &device;
+    VkDevice device;
 
     VulkanCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
 
-    VulkanRenderBuffer(const VulkanDevice &device_, uint32_t graphicsFamily)
-        : device(device_), commandPool(device, graphicsFamily) {}
+    VulkanRenderBuffer(VkDevice device, uint32_t graphicsFamily)
+        : device(device), commandPool(device, graphicsFamily) {}
 
-    virtual void begin(VulkanRenderPass &renderPass,
-                       VulkanSwapchain &swapChain);
-    virtual void end();
+    void begin(VulkanRenderPass &renderPass,
+               std::vector<std::unique_ptr<VulkanFramebuffer>> &framebuffers,
+               VkExtent2D extent);
+    void end();
 };
 
 } // namespace BR

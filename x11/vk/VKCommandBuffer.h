@@ -5,16 +5,17 @@
 namespace BR {
 
 class VulkanCommandBuffer {
-    const VkDevice &device;
-    const VkCommandPool &commandPool;
+    VkDevice device;
+    VkCommandPool commandPool;
     VkQueue graphicsQueue;
 
   public:
     VkCommandBuffer commandBuffer;
 
-    VulkanCommandBuffer(const VkDevice &device_,
-                        const VkCommandPool &commandPool_,
-                        VkQueue graphicsQueue_);
+    VulkanCommandBuffer(VkDevice device, VkCommandPool commandPool,
+                        VkQueue graphicsQueue);
+
+    void end();
     void submit();
     ~VulkanCommandBuffer();
 

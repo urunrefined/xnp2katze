@@ -4,42 +4,40 @@
 
 #include "VKBuffers.h"
 #include "VKPhysicalDevice.h"
+#include "gl/GLAlloc.h"
 #include "util/Matrix4x4.h"
 
 namespace BR {
 
 class VulkanDescriptorLayoutExt {
-    const VkDevice &device;
+    VkDevice device;
     VkDescriptorSetLayout layout;
 
   public:
-    VulkanDescriptorLayoutExt(const VkDevice &device_);
+    VulkanDescriptorLayoutExt(VkDevice device);
     ~VulkanDescriptorLayoutExt();
-    ;
 
     operator const VkDescriptorSetLayout &() const { return layout; }
 };
 
 class VulkanDescriptorSetExt {
-    const VkDevice &device;
-    VulkanPhysicalDevice &physicalDevice;
-    const VkDescriptorPool &descriptorPoolExt;
+    VkDevice device;
+    VulkanPhysicalDevice physicalDevice;
+    VkDescriptorPool descriptorPoolExt;
 
     std::vector<VkDescriptorSet> descriptorSets;
-
-  public:
-    VulkanUniformBuffer uniformBuffer;
+    UniformChunk chunk;
 
   private:
     size_t modelCount;
 
   public:
-    VulkanDescriptorSetExt(const VkDevice &device_,
+    VulkanDescriptorSetExt(VkDevice device,
                            VulkanPhysicalDevice &physicalDevice,
-                           VkImageView &imageView, VkSampler &sampler,
-                           const VkDescriptorPool &descriptorPoolExt_,
-                           const VkDescriptorSetLayout &layout,
-                           size_t modelCount_);
+                           const UniformChunk &chunk, VkImageView imageView,
+                           VkSampler sampler,
+                           VkDescriptorPool descriptorPoolExt,
+                           VkDescriptorSetLayout layout, size_t modelCount);
 
     ~VulkanDescriptorSetExt();
 
@@ -49,6 +47,9 @@ class VulkanDescriptorSetExt {
     const VkDescriptorSet &get(size_t index) const {
         return descriptorSets[index];
     }
+
+    static size_t getChunkSize(VulkanPhysicalDevice &physicalDevice,
+                               uint32_t modelCount);
 };
 
 } // namespace BR

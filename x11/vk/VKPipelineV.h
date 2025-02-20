@@ -1,5 +1,6 @@
 #pragma once
 
+#include "VKPipeline.h"
 #include "VKRenderBuffer.h"
 #include "VKShaders.h"
 
@@ -8,19 +9,16 @@ namespace BR {
 class PipelineV {
 
   public:
-    const VkDevice &device;
+    VulkanPipelineLayout pipelineLayout;
+    VulkanPipeline pipeline;
 
-    VkPipeline pipeline;
-    VkPipelineLayout pipelineLayout;
-
-    PipelineV(const VkDevice &device_, ShaderStore &shader3D,
-              const VkRect2D &scissor, const VkRenderPass &renderPass);
+    PipelineV(VkDevice device, ShaderStore &shader3D, const VkRect2D &scissor,
+              VkRenderPass renderPass);
 
     ~PipelineV();
 
-    VkPipeline &getPipeline();
-
-    void record(VulkanRenderBuffer &renderBuffer, size_t drawCount);
+    void record(VkCommandBuffer *commandBuffers, size_t bufferCount,
+                size_t drawCount);
 };
 
 } // namespace BR

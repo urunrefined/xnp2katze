@@ -236,25 +236,26 @@ SRC_CPP = \
 		x11/vk/VKDebug.cpp                             \
 		x11/vk/VKPhysicalDevice.cpp                    \
 		x11/vk/VKCommandPool.cpp                       \
-		x11/vk/VKEngine.cpp                            \
 		x11/vk/VKUtil.cpp                              \
 		x11/vk/VKDevice.cpp                            \
 		x11/vk/VKImage.cpp                             \
 		x11/vk/VKImageView.cpp                         \
 		x11/vk/VKImageMemory.cpp                       \
 		x11/vk/VKFramebuffer.cpp                       \
-		x11/vk/VKSwapchain.cpp                         \
 		x11/vk/VKRenderPass.cpp                        \
 		x11/vk/VKSync.cpp                              \
 		x11/vk/VKPhysicalDeviceEnumerations.cpp        \
-		x11/vk/VKSwapchainImages.cpp                   \
 		x11/vk/VKRenderBuffer.cpp                      \
 		x11/vk/VKShaders.cpp                           \
+		x11/vk/VKPipeline.cpp                          \
 		x11/vk/VKPipelineV.cpp                         \
 		x11/vk/VKPipelineTex.cpp                       \
 		x11/vk/VKPipelineTexExt.cpp                    \
+		x11/vk/VKPipelineTexExtIy.cpp                  \
+		x11/vk/VKPipelineTexExtIyColor.cpp             \
 		x11/vk/VKBuffers.cpp                           \
 		x11/vk/VKSampler.cpp                           \
+		x11/vk/VKDescriptorLayouts.cpp                 \
 		x11/vk/VKRenderer.cpp                          \
 		x11/vk/VKDescriptorSet.cpp                     \
 		x11/vk/VKDescriptorSetExt.cpp                  \
@@ -262,11 +263,24 @@ SRC_CPP = \
 		x11/vk/VKDescriptorPoolExt.cpp                 \
 		x11/vk/VKCommandBuffer.cpp                     \
 		x11/vk/VKTexture.cpp                           \
-		x11/vk/Image.cpp                               \
+		x11/vk/VKSwapChain.cpp                         \
+		x11/vk/VKSwapChainFramebuffers.cpp             \
+		x11/vk/VKScaler.cpp                            \
+		x11/vk/VKDepthImage.cpp                        \
+		x11/gl/GLGlyphCache.cpp                        \
+		x11/gl/GLConsole.cpp                           \
+		x11/gl/GLText.cpp                              \
+		x11/util/Deep.cpp                              \
 		x11/util/Vertex.cpp                            \
 		x11/util/Matrix4x4.cpp                         \
 		x11/util/Range.cpp                             \
-		x11/util/SignalFD.cpp
+		x11/util/SignalFD.cpp                          \
+		x11/util/LogBuffer.cpp                         \
+		x11/font/Fontconfig.cpp                        \
+		x11/font/FreeFont.cpp                          \
+		x11/font/Harfbuzz.cpp                          \
+		x11/font/Freetype.cpp
+
 		
 
 ifeq ($(VKDEBUG),1)
@@ -277,8 +291,8 @@ endif
 OBJ = $(SRC_C:.c=.o) $(SRC_CPP:.cpp=.o)
 DEP = $(SRC_C:.c=.d) $(SRC_CPP:.cpp=.d)
 
-FRAGSHADERSRC = $(wildcard x11/shader/*.frag)
-VERTSHADERSRC = $(wildcard x11/shader/*.vert)
+FRAGSHADERSRC = $(wildcard x11/shader/frag/*.frag)
+VERTSHADERSRC = $(wildcard x11/shader/vert/*.vert)
 
 VERTSHADEROBJ = $(VERTSHADERSRC:.vert=.spv)
 FRAGSHADEROBJ = $(FRAGSHADERSRC:.frag=.spv)

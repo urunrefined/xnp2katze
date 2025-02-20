@@ -42,8 +42,10 @@ VulkanDebugCallback::VulkanDebugCallback(VkInstance &instance_,
     if (!enableValidationLayers)
         return;
 
-    if (createDebugReportCallbackEXT() != VK_SUCCESS) {
-        throw std::runtime_error("failed to set up debug callback!");
+    int debugRet = createDebugReportCallbackEXT();
+
+    if (debugRet != VK_SUCCESS) {
+        throw "failed to set up debug callback!";
     }
 }
 

@@ -6,10 +6,10 @@ namespace BR {
 
 class VulkanSemaphore {
   public:
-    const VkDevice &device;
+    VkDevice device;
     VkSemaphore semaphore;
 
-    VulkanSemaphore(const VkDevice &device_);
+    VulkanSemaphore(VkDevice device);
 
     ~VulkanSemaphore();
 
@@ -20,10 +20,10 @@ class VulkanSemaphore {
 
 class VulkanFence {
   public:
-    const VkDevice &device;
+    VkDevice device;
     VkFence fence;
 
-    VulkanFence(const VkDevice &device_);
+    VulkanFence(VkDevice device);
     ~VulkanFence();
 
     operator VkFence &() { return fence; }
@@ -35,11 +35,11 @@ enum class SitterState { INIT, INACTIVE = 0, ACTIVE };
 
 class Sitter {
   public:
-    const VkDevice &device;
+    VkDevice device;
     VkFence fence;
     SitterState state = SitterState::INACTIVE;
 
-    Sitter(const VkDevice &device_);
+    Sitter(VkDevice device);
     ~Sitter();
 
     void activate();

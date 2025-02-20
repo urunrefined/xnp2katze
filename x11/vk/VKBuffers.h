@@ -6,17 +6,15 @@
 namespace BR {
 
 class VulkanBufferGeneric {
-    const VkDevice &device;
-
+    VkDevice device;
     VkBuffer buffer;
     VkDeviceMemory bufferMemory;
 
   public:
     VkDeviceSize size;
 
-    VulkanBufferGeneric(const VkDevice &device_,
-                        const VkPhysicalDevice &physicalDevice,
-                        VkDeviceSize size_, VkBufferUsageFlags usage,
+    VulkanBufferGeneric(VkDevice device, VkPhysicalDevice physicalDevice,
+                        VkDeviceSize size, VkBufferUsageFlags usage,
                         VkMemoryPropertyFlags properties);
     VulkanBufferGeneric(const VulkanBufferGeneric &) = delete;
 
@@ -28,7 +26,7 @@ class VulkanBufferGeneric {
 };
 
 class VulkanCmbBuffer {
-    const VkDevice &device;
+    const VkDevice device;
 
   public:
     VulkanBufferGeneric bufferCard;
@@ -36,8 +34,7 @@ class VulkanCmbBuffer {
 
     Ranges ranges;
 
-    VulkanCmbBuffer(const VkDevice &device_,
-                    const VkPhysicalDevice &physicalDevice,
+    VulkanCmbBuffer(VkDevice device, VkPhysicalDevice physicalDevice,
                     VkBufferUsageFlags usage, size_t size);
     VulkanCmbBuffer(const VulkanCmbBuffer &that) = delete;
 
@@ -50,15 +47,15 @@ class VulkanCmbBuffer {
 
 class VulkanVtxBuffer : public VulkanCmbBuffer {
   public:
-    VulkanVtxBuffer(const VkDevice &device_,
-                    const VkPhysicalDevice &physicalDevice, size_t size);
+    VulkanVtxBuffer(VkDevice device, VkPhysicalDevice physicalDevice,
+                    size_t size);
     VulkanVtxBuffer(const VulkanVtxBuffer &that) = delete;
 };
 
 class VulkanUniformBuffer : public VulkanCmbBuffer {
   public:
-    VulkanUniformBuffer(const VkDevice &device_,
-                        const VkPhysicalDevice &physicalDevice, size_t size);
+    VulkanUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice,
+                        size_t size);
     VulkanUniformBuffer(const VulkanVtxBuffer &that) = delete;
 };
 

@@ -1,21 +1,17 @@
 #include "VKTexture.h"
 #include "VKBuffers.h"
 #include "VKCommandBuffer.h"
-#include <string.h>
 
 namespace BR {
 
-static void transitionImageLayout(const VkDevice &device,
-                                  const VkCommandPool &commandPool,
-                                  const VkQueue &graphicsQueue, VkImage image,
-                                  VkImageLayout oldLayout,
-                                  VkImageLayout newLayout) {
-    VulkanCommandBuffer commandBuffer(device, commandPool, graphicsQueue);
+static void
+transitionImageLayoutToPushable(VkImage image,
+                                VulkanCommandBuffer &commandBuffer) {
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.oldLayout = oldLayout;
-    barrier.newLayout = newLayout;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.image = image;
@@ -28,36 +24,77 @@ static void transitionImageLayout(const VkDevice &device,
     VkPipelineStageFlags sourceStage;
     VkPipelineStageFlags destinationStage;
 
-    if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
-        newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-        barrier.srcAccessMask = 0;
-        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
-               newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-        sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    } else {
-        throw std::invalid_argument("unsupported layout transition!");
-    }
+    sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 
     vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0,
                          nullptr, 0, nullptr, 1, &barrier);
-
-    commandBuffer.submit();
 }
 
-static void copyBufferToImage(const VkDevice device,
-                              const VkCommandPool &commandPool,
-                              VkQueue &graphicsQueue, VkBuffer buffer,
-                              VkImage image, uint32_t width, uint32_t height) {
-    VulkanCommandBuffer commandBuffer(device, commandPool, graphicsQueue);
+static void
+transitionImageLayoutToShaderReadable(VkImage image,
+                                      VulkanCommandBuffer &commandBuffer) {
 
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags sourceStage;
+    VkPipelineStageFlags destinationStage;
+
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+    vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0,
+                         nullptr, 0, nullptr, 1, &barrier);
+}
+
+static void
+transitionImageLayoutToFetchable(VkImage image,
+                                 VulkanCommandBuffer &commandBuffer) {
+
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags sourceStage =
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+    vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0,
+                         nullptr, 0, nullptr, 1, &barrier);
+}
+
+static void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
+                              uint32_t height,
+                              VulkanCommandBuffer &commandBuffer) {
     VkBufferImageCopy region{};
     region.bufferOffset = 0;
     region.bufferRowLength = 0;
@@ -71,137 +108,63 @@ static void copyBufferToImage(const VkDevice device,
 
     vkCmdCopyBufferToImage(commandBuffer, buffer, image,
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
-    commandBuffer.submit();
 }
 
-static bool lineHasData(const unsigned char *data, unsigned int width) {
-    for (unsigned int x = 0; x < width * 4; x++) {
-        if (data[x])
-            return true;
-    }
+static void copyImageToBuffer(VkBuffer buffer, VkImage image, uint32_t width,
+                              uint32_t height,
+                              VulkanCommandBuffer &commandBuffer) {
 
-    return false;
+    VkBufferImageCopy region{};
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+    region.imageOffset = {0, 0, 0};
+    region.imageExtent = {width, height, 1};
+
+    vkCmdCopyImageToBuffer(commandBuffer, image,
+                           VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1,
+                           &region);
 }
 
-struct LineSegment {
-    uint16_t start;
-    uint16_t size;
-};
+static void update2(VkBuffer buffer, VkImage &image, uint32_t width,
+                    uint32_t height, VulkanCommandBuffer &commandBuffer) {
 
-static std::vector<LineSegment>
-getLineSegments(const unsigned char *data, uint16_t width, uint16_t pxCutOff) {
-    uint16_t start = 0;
-    uint16_t sz = 0;
+    transitionImageLayoutToPushable(image, commandBuffer);
 
-    std::vector<LineSegment> blankSegments;
+    copyBufferToImage(buffer, image, width, height, commandBuffer);
 
-    for (uint16_t w = 0; w < width; w++) {
-        if (sz == 0) {
-            start = w;
-        }
-
-        if (data[w * 4 + 0] || data[w * 4 + 1] || data[w * 4 + 2] ||
-            data[w * 4 + 3]) {
-            if (sz >= pxCutOff) {
-                blankSegments.push_back({start, sz});
-            }
-
-            sz = 0;
-        } else {
-            sz++;
-        }
-    }
-
-    if (sz >= pxCutOff) {
-        blankSegments.push_back({start, sz});
-    }
-
-    return blankSegments;
+    transitionImageLayoutToShaderReadable(image, commandBuffer);
 }
 
-static uint16_t addAll(const std::vector<LineSegment> &segments) {
-    uint16_t ret = 0;
+// Texture must be in VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL before calling this
+static void fetch2(VkBuffer buffer, VkImage &image, uint32_t width,
+                   uint32_t height, VulkanCommandBuffer &commandBuffer) {
 
-    for (auto &segment : segments) {
-        ret += segment.size;
-    }
-
-    return ret;
+    transitionImageLayoutToFetchable(image, commandBuffer);
+    copyImageToBuffer(buffer, image, width, height, commandBuffer);
 }
 
-static void doubleBlankLinesAdaptive(uint16_t width, uint16_t height,
-                                     const unsigned char *in,
-                                     unsigned char *out, uint16_t cutOff) {
-    memcpy(out, in, width * 4);
-
-    for (uint16_t h = 1; h < height - 1; h++) {
-        if (lineHasData(in + (h + 1) * width * 4, width)) {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
-            auto lineSegments = getLineSegments(in + (h)*width * 4, width, 30);
-
-            if (addAll(lineSegments) > cutOff) {
-                for (auto &lineSegment : lineSegments) {
-
-                    memcpy(out + (h)*width * 4 + (lineSegment.start * 4),
-                           in + (h - 1) * width * 4 + (lineSegment.start * 4),
-                           lineSegment.size * 4);
-                }
-            }
-        } else {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
-        }
-    }
-
-    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
-           width * 4);
+void VulkanTextureGeneric::fetch(VulkanCommandBuffer &commandBuffer) {
+    fetch2(stagingBuffer, texture, width, height, commandBuffer);
 }
 
-static void doubleBlankLines(uint16_t width, uint16_t height,
-                             const unsigned char *in, unsigned char *out) {
-    memcpy(out, in, width * 4);
-
-    for (uint16_t h = 1; h < height - 1; h++) {
-        if (!lineHasData(in + h * width * 4, width) &&
-            lineHasData(in + (h + 1) * width * 4, width)) {
-            memcpy(out + (h)*width * 4, in + (h - 1) * width * 4, width * 4);
-        } else {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
-        }
-    }
-
-    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
-           width * 4);
-}
-
-void VulkanTexture::update(DoubleLines doubleLines) {
+void VulkanTextureGeneric::update(VulkanCommandBuffer &commandBuffer) {
     if (textureDirty) {
-        void *data;
-        vkMapMemory(device, stagingBuffer, 0, image.data.size(), 0, &data);
-        if (doubleLines == DoubleLines::NO) {
-            memcpy(data, image.data.data(), image.data.size());
-        } else if (doubleLines == DoubleLines::ADAPTIVE) {
-            doubleBlankLinesAdaptive(image.width, image.height,
-                                     image.data.data(), (unsigned char *)data,
-                                     120);
-        } else {
-            doubleBlankLines(image.width, image.height, image.data.data(),
-                             (unsigned char *)data);
-        }
-
-        vkUnmapMemory(device, stagingBuffer);
-
-        transitionImageLayout(device, commandPool, graphicsQueue, texture,
-                              VK_IMAGE_LAYOUT_UNDEFINED,
-                              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        copyBufferToImage(device, commandPool, graphicsQueue, stagingBuffer,
-                          texture, image.width, image.height);
-        transitionImageLayout(device, commandPool, graphicsQueue, texture,
-                              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        update2(stagingBuffer, texture, width, height, commandBuffer);
     }
+}
 
-    textureDirty = false;
+unsigned int getFormatComponents(VkFormat format) {
+    if (format == VK_FORMAT_R8_UNORM)
+        return 1;
+    if (format == VK_FORMAT_B8G8R8A8_UNORM)
+        return 4;
+
+    throw "Not a supported format";
 }
 
 } // namespace BR

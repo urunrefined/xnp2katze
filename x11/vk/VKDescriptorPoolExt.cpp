@@ -1,12 +1,11 @@
 #include "VKDescriptorPoolExt.h"
 #include "util/Core.h"
-#include <stdexcept>
 
 namespace BR {
 
-VulkanDescriptorPoolExt::VulkanDescriptorPoolExt(const VkDevice &device_,
+VulkanDescriptorPoolExt::VulkanDescriptorPoolExt(VkDevice device,
                                                  uint32_t descriptorCount)
-    : device(device_) {
+    : device(device) {
     VkDescriptorPoolSize poolSizes[2];
 
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -24,7 +23,7 @@ VulkanDescriptorPoolExt::VulkanDescriptorPoolExt(const VkDevice &device_,
 
     if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor pool!");
+        throw "failed to create descriptor pool!";
     }
 }
 

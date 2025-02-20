@@ -1,17 +1,16 @@
-#include <algorithm>
+
 #include <array>
 #include <fstream>
 #include <memory>
 #include <new>
 #include <set>
-#include <stdexcept>
 #include <vector>
 
 #include "VKUtil.h"
 
 namespace BR {
 
-uint32_t findMemoryType(const VkPhysicalDevice &physicalDevice,
+uint32_t findMemoryType(const VkPhysicalDevice physicalDevice,
                         uint32_t typeFilter, VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -24,7 +23,7 @@ uint32_t findMemoryType(const VkPhysicalDevice &physicalDevice,
         }
     }
 
-    throw std::runtime_error("failed to find suitable memory type!");
+    throw "failed to find suitable memory type!";
 }
 
 VkRect2D getIntegerScissor(unsigned int multipleX, unsigned int multipleY,
@@ -65,8 +64,6 @@ VkRect2D getAspectScissor(double ideal, unsigned int width,
     if (yOffset > height)
         yOffset = height;
 
-    // printf("%u, %u | %u, %u | %u, %u\n", width, height, xOffset/2, yOffset /
-    // 2, width - xOffset, height - yOffset);
     VkRect2D scissor;
 
     scissor.offset = VkOffset2D{(int32_t)(xOffset / 2), (int32_t)(yOffset / 2)};
@@ -104,8 +101,8 @@ VkRect2D get1to1Scissor(unsigned int width, unsigned int height) {
     return scissor;
 }
 
-SwapChainSupportDetails::SwapChainSupportDetails(const VkPhysicalDevice &device,
-                                                 const VkSurfaceKHR &surface) {
+SwapChainSupportDetails::SwapChainSupportDetails(const VkPhysicalDevice device,
+                                                 const VkSurfaceKHR surface) {
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &capabilities);
 
@@ -130,7 +127,7 @@ SwapChainSupportDetails::SwapChainSupportDetails(const VkPhysicalDevice &device,
     }
 }
 
-static VkFormat findSupportedFormat(const VkPhysicalDevice &physicalDevice,
+static VkFormat findSupportedFormat(const VkPhysicalDevice physicalDevice,
                                     const std::vector<VkFormat> &candidates,
                                     VkImageTiling tiling,
                                     VkFormatFeatureFlags features) {
@@ -147,10 +144,10 @@ static VkFormat findSupportedFormat(const VkPhysicalDevice &physicalDevice,
         }
     }
 
-    throw std::runtime_error("failed to find supported format!");
+    throw "failed to find supported format!";
 }
 
-VkFormat findDepthFormat(const VkPhysicalDevice &physicalDevice) {
+VkFormat findDepthFormat(VkPhysicalDevice physicalDevice) {
     return findSupportedFormat(physicalDevice,
                                {VK_FORMAT_D32_SFLOAT,
                                 VK_FORMAT_D32_SFLOAT_S8_UINT,
@@ -160,7 +157,7 @@ VkFormat findDepthFormat(const VkPhysicalDevice &physicalDevice) {
 }
 
 bool hasGraphicsQueue(
-    VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface,
+    VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
     uint32_t i = 0;
@@ -182,7 +179,7 @@ bool hasGraphicsQueue(
 }
 
 bool hasPresentQueue(
-    VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface,
+    VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
     uint32_t i = 0;
@@ -206,7 +203,7 @@ bool hasPresentQueue(
 }
 
 uint32_t getFirstPresentQueue(
-    VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface,
+    VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
     uint32_t i = 0;
@@ -227,12 +224,12 @@ uint32_t getFirstPresentQueue(
     }
 
     // we should never get here
-    throw std::runtime_error("getFirstPresentQueue called on device without "
-                             "any present queue available");
+    throw "getFirstPresentQueue called on device without any present queue "
+          "available";
 }
 
 bool getFirstGraphicsQueue(
-    VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface,
+    VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
     uint32_t i = 0;
@@ -251,8 +248,27 @@ bool getFirstGraphicsQueue(
     }
 
     // we should never get here
-    throw std::runtime_error("getFirstGraphicsQueue called on device without "
-                             "any graphics queue available");
+    throw "getFirstGraphicsQueue called on device without any graphics queue "
+          "available";
+}
+
+bool getFirstGraphicsQueue(
+    const std::vector<VkQueueFamilyProperties> &queueFamilies) {
+
+    uint32_t i = 0;
+
+    for (const auto &queueFamily : queueFamilies) {
+        if (queueFamily.queueCount > 0 &&
+            queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            return i;
+        }
+
+        i++;
+    }
+
+    // we should never get here
+    throw "getFirstGraphicsQueue called on device without any graphics queue "
+          "available";
 }
 
 std::vector<VkQueueFamilyProperties>
@@ -266,6 +282,33 @@ findQueueFamilies(VkPhysicalDevice physicalDevice) {
                                              queueFamilies.data());
 
     return queueFamilies;
+}
+
+VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanInstance &instance,
+                                               VkSurfaceKHR surface) {
+    BR::VulkanPhysicalDeviceEnumerations physicalDeviceEnums(instance);
+
+    for (BR::VulkanPhysicalDevice &physicalDevice :
+         physicalDeviceEnums.physicalDevices) {
+        // Use the first one available
+        if (physicalDevice.isDeviceSuitable(surface)) {
+            return physicalDevice;
+        }
+    }
+
+    throw "No graphics device suitable";
+}
+
+VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanInstance &instance) {
+    BR::VulkanPhysicalDeviceEnumerations physicalDeviceEnums(instance);
+
+    for (BR::VulkanPhysicalDevice &physicalDevice :
+         physicalDeviceEnums.physicalDevices) {
+        // Use the first one available
+        return physicalDevice;
+    }
+
+    throw "No graphics device suitable";
 }
 
 } // namespace BR

@@ -1,10 +1,13 @@
 #pragma once
 
+#include "VKDescriptorLayouts.h"
 #include "VKDescriptorSet.h"
 #include "VKDescriptorSetExt.h"
 #include "VKPhysicalDevice.h"
 #include "VKPipelineTex.h"
 #include "VKPipelineTexExt.h"
+#include "VKPipelineTexExtIy.h"
+#include "VKPipelineTexExtIyColor.h"
 #include "VKPipelineV.h"
 #include "VKRenderPass.h"
 #include "VKSampler.h"
@@ -15,11 +18,10 @@ namespace BR {
 
 class VulkanRenderer {
   public:
-    const VkPhysicalDevice &physicalDevice;
-    const VulkanDevice &device;
+    VkPhysicalDevice physicalDevice;
+    VkDevice device;
 
     ShaderStore &shaderStore;
-    VulkanRenderPass renderPass;
 
     std::unique_ptr<PipelineV> pipelineV;
     std::unique_ptr<PipelineTex> pipelineAspect;
@@ -27,19 +29,19 @@ class VulkanRenderer {
     std::unique_ptr<PipelineTex> pipelineStretch;
     std::unique_ptr<PipelineTex> pipelineInteger;
     std::unique_ptr<PipelineTexExt> pipelineExt1to1;
+    std::unique_ptr<PipelineTexExt> pipelineExt16to9;
     std::unique_ptr<PipelineTexExt> pipelineStretchExt;
+    std::unique_ptr<PipelineTexExtIy> pipelineExtIy16to9;
+    std::unique_ptr<PipelineTexExtIyColor> pipelineExtIyColor16to9;
 
-    uint32_t graphicsFamily;
-    VkQueue &graphicsQueue;
-    VulkanSampler sampler;
+    VulkanDescriptorLayouts &layouts;
 
-    VulkanDescriptorLayout descriptorLayout;
-    VulkanDescriptorLayoutExt descriptorLayoutExt;
+    VulkanRenderPass &renderPass;
 
-    VulkanRenderer(const VulkanPhysicalDevice &physicalDevice_,
-                   const VulkanDevice &device_, uint32_t graphicsFamily_,
-                   VkQueue &graphicsQueue_, ShaderStore &shaderStore_,
-                   VkFormat swapChainFormat, VkExtent2D swapChainExtent);
+    VulkanRenderer(VulkanPhysicalDevice &physicalDevice, VkDevice device,
+                   ShaderStore &shaderStore, const VkExtent2D &swapChainExtent,
+                   VulkanRenderPass &renderpass,
+                   VulkanDescriptorLayouts &layouts);
 
     void reCreatePipeline(VkExtent2D swapChainExtent) {
         static const unsigned int pc98Width = 640;
@@ -50,42 +52,46 @@ class VulkanRenderer {
                 getAspectScissor((double)pc98Width / (double)pc98Height,
                                  swapChainExtent.width, swapChainExtent.height);
 
-            printf("Recreate aspect pipeline with offset [%u, %u], extent [%u, "
-                   "%u]\n",
-                   scissor.offset.x, scissor.offset.y, scissor.extent.width,
-                   scissor.extent.height);
-
-            pipelineV = std::unique_ptr<PipelineV>(
-                new PipelineV(device, shaderStore, scissor, renderPass));
-            pipelineAspect = std::unique_ptr<PipelineTex>(new PipelineTex(
-                device, shaderStore, scissor, renderPass, descriptorLayout));
+            pipelineV = std::make_unique<PipelineV>(device, shaderStore,
+                                                    scissor, renderPass);
+            pipelineAspect = std::make_unique<PipelineTex>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayout);
         }
 
         {
             VkRect2D scissor = getAspectScissor(1, swapChainExtent.width,
                                                 swapChainExtent.height);
 
-            printf("Recreate 1to1 aspect pipeline with offset [%u, %u], extent "
-                   "[%u, %u]\n",
-                   scissor.offset.x, scissor.offset.y, scissor.extent.width,
-                   scissor.extent.height);
+            pipelineAspect1to1 = std::make_unique<PipelineTex>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayout);
+        }
 
-            pipelineAspect1to1 = std::unique_ptr<PipelineTex>(new PipelineTex(
-                device, shaderStore, scissor, renderPass, descriptorLayout));
+        {
+            VkRect2D scissor = getAspectScissor(
+                16.f / 9.f, swapChainExtent.width, swapChainExtent.height);
+
+            pipelineExt16to9 = std::make_unique<PipelineTexExt>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayoutExt);
+
+            pipelineExtIy16to9 = std::make_unique<PipelineTexExtIy>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayoutExt);
+
+            pipelineExtIyColor16to9 = std::make_unique<PipelineTexExtIyColor>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayoutExt);
         }
 
         {
             VkRect2D scissor =
                 get1to1Scissor(swapChainExtent.width, swapChainExtent.height);
 
-            printf("Recreate 1to1 pipeline with offset [%u, %u], extent [%u, "
-                   "%u]\n",
-                   scissor.offset.x, scissor.offset.y, scissor.extent.width,
-                   scissor.extent.height);
-
-            pipelineExt1to1 = std::unique_ptr<PipelineTexExt>(
-                new PipelineTexExt(device, shaderStore, scissor, renderPass,
-                                   descriptorLayoutExt));
+            pipelineExt1to1 = std::make_unique<PipelineTexExt>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayoutExt);
         }
 
         {
@@ -93,36 +99,26 @@ class VulkanRenderer {
                 getIntegerScissor(pc98Width, pc98Height, swapChainExtent.width,
                                   swapChainExtent.height);
 
-            printf("Recreate integer pipeline with offset [%u, %u], extent "
-                   "[%u, %u]\n",
-                   scissor.offset.x, scissor.offset.y, scissor.extent.width,
-                   scissor.extent.height);
-
-            pipelineInteger = std::unique_ptr<PipelineTex>(new PipelineTex(
-                device, shaderStore, scissor, renderPass, descriptorLayout));
+            pipelineInteger = std::make_unique<PipelineTex>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayout);
         }
         {
 
             VkRect2D scissor{{0, 0},
                              {swapChainExtent.width, swapChainExtent.height}};
 
-            printf("Recreate stretch pipeline with offset [%u, %u], extent "
-                   "[%u, %u]\n",
-                   scissor.offset.x, scissor.offset.y, scissor.extent.width,
-                   scissor.extent.height);
+            pipelineStretch = std::make_unique<PipelineTex>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayout);
 
-            pipelineStretch = std::unique_ptr<PipelineTex>(new PipelineTex(
-                device, shaderStore, scissor, renderPass, descriptorLayout));
-
-            pipelineStretchExt = std::unique_ptr<PipelineTexExt>(
-                new PipelineTexExt(device, shaderStore, scissor, renderPass,
-                                   descriptorLayoutExt));
+            pipelineStretchExt = std::make_unique<PipelineTexExt>(
+                device, shaderStore, scissor, renderPass,
+                layouts.descriptorLayoutExt);
         }
     }
 
     virtual ~VulkanRenderer() {}
-
-    operator VkRenderPass &() { return renderPass; }
 };
 
 } // namespace BR

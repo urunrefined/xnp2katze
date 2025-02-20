@@ -8,11 +8,11 @@ namespace BR {
 
 class ShaderStage {
   public:
-    const VkDevice &device;
+    VkDevice device;
 
     VkShaderModule shaderModule;
 
-    ShaderStage(const VkDevice &device_, const std::vector<char> &code);
+    ShaderStage(VkDevice device, const std::vector<char> &code);
     ~ShaderStage();
 
     operator VkShaderModule &();
@@ -25,11 +25,14 @@ class ShaderStore {
     ShaderStage vertTri;
     ShaderStage fragTri;
     ShaderStage vertTexExt;
+    ShaderStage vertTexExtColor;
 
     ShaderStage vertTex;
     ShaderStage fragTex;
+    ShaderStage fragTexIy;
+    ShaderStage fragTexIyColor;
 
-    ShaderStore(const VkDevice &device);
+    ShaderStore(VkDevice device);
 
     ~ShaderStore();
 };

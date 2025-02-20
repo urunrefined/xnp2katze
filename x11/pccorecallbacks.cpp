@@ -36,17 +36,17 @@ SCRNSURF scrnmng_surflock(void *inContext) {
 
     SCRNSURF scrnsurf;
 
-    scrnsurf.ptr = (UINT8 *)context->texture->image.data.data();
+    scrnsurf.ptr = (UINT8 *)context->image.data;
     scrnsurf.bpp = 32;
-    scrnsurf.width = context->texture->image.width;
-    scrnsurf.height = context->texture->image.height;
+    scrnsurf.width = context->image.width;
+    scrnsurf.height = context->image.height;
     scrnsurf.xalign = 4;
-    scrnsurf.yalign = context->texture->image.width * 4;
+    scrnsurf.yalign = context->image.width * 4;
 
     return scrnsurf;
 }
 
 void scrnmng_surfunlock(void *inContext) {
     BR::CallbackContext *context = (BR::CallbackContext *)inContext;
-    context->texture->textureDirty = true;
+    context->dirty = true;
 }

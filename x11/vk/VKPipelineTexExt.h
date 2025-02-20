@@ -1,5 +1,6 @@
 #pragma once
 
+#include "VKPipeline.h"
 #include "VKRenderBuffer.h"
 #include "VKShaders.h"
 
@@ -8,22 +9,18 @@ namespace BR {
 class PipelineTexExt {
 
   public:
-    const VkDevice &device;
+    VulkanPipelineLayout pipelineLayout;
+    VulkanPipeline pipeline;
 
-    VkPipeline pipeline;
-    VkPipelineLayout pipelineLayout;
-
-    PipelineTexExt(const VkDevice &device_, ShaderStore &shader3D,
-                   const VkRect2D &scissor, const VkRenderPass &renderPass,
-                   const VkDescriptorSetLayout &desciptorSetLayout);
+    PipelineTexExt(const VkDevice device, ShaderStore &shader3D,
+                   const VkRect2D &scissor, const VkRenderPass renderPass,
+                   const VkDescriptorSetLayout desciptorSetLayout);
 
     ~PipelineTexExt();
 
-    VkPipeline &getPipeline();
-
-    void record(VulkanRenderBuffer &renderBuffer,
-                const VkDescriptorSet &descriptorSet, VkBuffer vertices,
-                VkDeviceSize verticesOffset, VkBuffer uvs,
+    void record(VkCommandBuffer *commandBuffers, size_t bufferCount,
+                const VkDescriptorSet descriptorSet, const VkBuffer vertices,
+                const VkDeviceSize verticesOffset, const VkBuffer uvs,
                 VkDeviceSize uvOffset, size_t drawCount);
 };
 

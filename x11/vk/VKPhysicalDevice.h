@@ -12,10 +12,10 @@ class VulkanPhysicalDevice {
     VkPhysicalDeviceProperties deviceProperties;
     std::vector<VkQueueFamilyProperties> queueFamilies;
 
-    VulkanPhysicalDevice(VkPhysicalDevice physicalDevice_);
+    VulkanPhysicalDevice(VkPhysicalDevice physicalDevice);
     ~VulkanPhysicalDevice() = default;
 
-    bool isDeviceSuitable(VkSurfaceKHR &surface);
+    bool isDeviceSuitable(VkSurfaceKHR surface);
 
     VkDeviceSize getMinUniformBufferOffsetAlignment() const {
         return deviceProperties.limits.minUniformBufferOffsetAlignment;

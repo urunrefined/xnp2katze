@@ -4,14 +4,15 @@
 
 namespace BR {
 
+enum class ShouldPresent { YES, NO };
+
 class VulkanRenderPass {
   public:
-    const VkDevice &device;
+    VkDevice device;
     VkRenderPass renderPass;
 
-    VulkanRenderPass(const VkDevice &device_,
-                     const VkPhysicalDevice &physicalDevice,
-                     VkFormat swapChainImageFormat);
+    VulkanRenderPass(VkDevice device, VkFormat colorFormat,
+                     VkFormat depthFormat, ShouldPresent present);
     ~VulkanRenderPass();
 
     operator VkRenderPass &() { return renderPass; }

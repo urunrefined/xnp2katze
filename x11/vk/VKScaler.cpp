@@ -1,11 +1,7 @@
-#include "VKEngine.h"
+#include "VKScaler.h"
 #include <assert.h>
 
 namespace BR {
-
-VulkanContext::VulkanContext(bool enableValidationLayers)
-    : glfwCtx(640, 400), instance(enableValidationLayers),
-      callback(instance, enableValidationLayers), surface(glfwCtx, instance) {}
 
 static void copyBuffer(const std::vector<Range> &ranges,
                        VkCommandBuffer &commandBuffer,
@@ -15,6 +11,8 @@ static void copyBuffer(const std::vector<Range> &ranges,
 
         for (size_t i = 0; i < ranges.size(); i++) {
             buffers[i] = {ranges[i].start, ranges[i].start, ranges[i].size};
+            //      printf("Copy start %zu, size: %zu\n", ranges[i].start,
+            //      ranges[i].size);
         }
 
         vkCmdCopyBuffer(commandBuffer, gBuffer.stagingBuffer,
@@ -54,15 +52,16 @@ static RenderState aquireImage(VkDevice &device,
         return RenderState::NEEDSSWAPCHAINUPDATE;
     } else if (resultImage != VK_SUCCESS) {
         imageSitter.cancel();
-        throw std::runtime_error("failed to acquire swap chain image!");
+        throw "failed to acquire swap chain image!";
     }
 
     return RenderState::OK;
 }
 
-static RenderState present(VulkanSemaphore &renderFinishedSemaphore,
-                           VkSwapchainKHR &swapchainImages,
-                           uint32_t &imageIndex, VkQueue &presentQueue) {
+static RenderState presentIfFinished(VulkanSemaphore &renderFinishedSemaphore,
+                                     VkSwapchainKHR swapchain,
+                                     uint32_t &imageIndex,
+                                     VkQueue presentQueue) {
     // printf("Aquir 3 "); (Time() - ref).print();
 
     VkPresentInfoKHR presentInfo = {};
@@ -71,7 +70,7 @@ static RenderState present(VulkanSemaphore &renderFinishedSemaphore,
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = renderFinishedSemaphore;
 
-    VkSwapchainKHR swapChains[] = {swapchainImages};
+    VkSwapchainKHR swapChains[] = {swapchain};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
@@ -82,56 +81,47 @@ static RenderState present(VulkanSemaphore &renderFinishedSemaphore,
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         // Nothing. Will be handled the next time we update
     } else if (result != VK_SUCCESS) {
-        throw std::runtime_error("failed to present swap chain image!");
+        throw "failed to present swap chain image!";
     }
 
     return RenderState::OK;
 }
 
-RenderState
-VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
-                             std::vector<VulkanCmbBuffer *> &cmbBuffers) {
+void VulkanScaler::present(uint32_t imageIdx, VkSwapchainKHR swapchain) {
+    presentIfFinished(renderSemaphores.renderFinishedSemaphore, swapchain,
+                      imageIdx, device.presentQueue);
 
-    assert(queueSitter.done());
-    assert(imageSitter.done());
+    imageSitter.block();
+}
+
+RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
+                             std::vector<VulkanCmbBuffer *> &cmbBuffers,
+                             std::vector<VulkanTextureGeneric *> &textures,
+                             VkSwapchainKHR swapchainImages) {
+
+    uint32_t imageIndex;
 
     RenderState renderState =
         aquireImage(device, swapchainImages, imageSitter,
-                    renderSemaphores->imageAvailableSemaphore, imageIndex);
+                    renderSemaphores.imageAvailableSemaphore, imageIndex);
 
     if (renderState != RenderState::OK)
-        return renderState;
+        return {renderState, 0};
 
-    VkCommandBufferAllocateInfo allocInfo = {};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = pool;
-    allocInfo.commandBufferCount = 1;
+    commandBuffer = std::make_unique<VulkanCommandBuffer>(device, pool,
+                                                          device.graphicsQueue);
 
-    // TODO: ERROR HANDLING
-    if (commandBuffer == VK_NULL_HANDLE) {
-        vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
-    } else {
-        vkFreeCommandBuffers(device, pool, 1, &commandBuffer);
-        vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
-    }
-
-    if (commandBuffer == VK_NULL_HANDLE) {
-        throw std::runtime_error("failed to submit draw command buffer!");
-    }
-
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    //  VulkanCommandBuffer commandBuffer2(device);
 
     for (VulkanCmbBuffer *cmbBuffer : cmbBuffers) {
-        copyBuffer(cmbBuffer->ranges.ranges, commandBuffer, *cmbBuffer);
-        cmbBuffer->ranges.ranges.clear();
+        copyBuffer(cmbBuffer->ranges.ranges, *commandBuffer, *cmbBuffer);
     }
 
-    vkEndCommandBuffer(commandBuffer);
+    for (VulkanTextureGeneric *texture : textures) {
+        texture->update(*commandBuffer);
+    }
+
+    (*commandBuffer).end();
 
     VkSubmitInfo submitInfo[2] = {};
     VkPipelineStageFlags flagsWaitForImage =
@@ -142,16 +132,16 @@ VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
         updateSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
         updateSubmitInfo.commandBufferCount = 1;
-        updateSubmitInfo.pCommandBuffers = &commandBuffer;
+        updateSubmitInfo.pCommandBuffers = &(commandBuffer->commandBuffer);
 
         updateSubmitInfo.waitSemaphoreCount = 1;
         updateSubmitInfo.pWaitSemaphores =
-            renderSemaphores->imageAvailableSemaphore;
+            renderSemaphores.imageAvailableSemaphore;
         updateSubmitInfo.pWaitDstStageMask = &flagsWaitForImage;
 
         updateSubmitInfo.signalSemaphoreCount = 1;
         updateSubmitInfo.pSignalSemaphores =
-            renderSemaphores->vboUpdatedSemaphore;
+            renderSemaphores.vboUpdatedSemaphore;
     }
 
     VkPipelineStageFlags flagsWaitForVBOUpdate = VK_PIPELINE_STAGE_TRANSFER_BIT;
@@ -161,7 +151,7 @@ VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
         drawSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
         drawSubmitInfo.waitSemaphoreCount = 1;
-        drawSubmitInfo.pWaitSemaphores = renderSemaphores->vboUpdatedSemaphore;
+        drawSubmitInfo.pWaitSemaphores = renderSemaphores.vboUpdatedSemaphore;
         drawSubmitInfo.pWaitDstStageMask = &flagsWaitForVBOUpdate;
 
         drawSubmitInfo.commandBufferCount = 1;
@@ -171,7 +161,7 @@ VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
 
         drawSubmitInfo.signalSemaphoreCount = 1;
         drawSubmitInfo.pSignalSemaphores =
-            renderSemaphores->renderFinishedSemaphore;
+            renderSemaphores.renderFinishedSemaphore;
     }
 
     // Need to make sure that the command-buffers are never deleted
@@ -185,13 +175,38 @@ VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
 
     if (vkQueueSubmit(device.graphicsQueue, 2, submitInfo, queueSitter) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to submit draw command buffer!");
+        throw "failed to submit draw command buffer!";
     }
 
     // printf("Aquir 3 "); (Time() - ref).print();
 
-    present(renderSemaphores->renderFinishedSemaphore, swapchainImages,
-            imageIndex, device.presentQueue);
+    for (VulkanCmbBuffer *cmbBuffer : cmbBuffers) {
+        cmbBuffer->ranges.ranges.clear();
+    }
+
+    for (VulkanTextureGeneric *texture : textures) {
+        texture->clean();
+    }
+
+    return {RenderState::OK, imageIndex};
+}
+
+RenderState
+VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
+                             std::vector<VulkanCmbBuffer *> &cmbBuffers,
+                             std::vector<VulkanTextureGeneric *> &textures,
+                             VkSwapchainKHR swapchain) {
+
+    assert(queueSitter.done());
+    assert(imageSitter.done());
+
+    RenderIdx idx = draw(renderBuffer, cmbBuffers, textures, swapchain);
+
+    if (idx.state != RenderState::OK)
+        return idx.state;
+
+    presentIfFinished(renderSemaphores.renderFinishedSemaphore, swapchain,
+                      idx.index, device.presentQueue);
 
     imageSitter.block();
     return RenderState::OK;

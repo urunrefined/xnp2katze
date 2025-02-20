@@ -1,9 +1,9 @@
 #pragma once
 
-#include "enums.h"
+#include "glfw/Input.h"
 #include "keystat.h"
 #include "pulse/PulseSoundEngine.h"
-#include "glfw/Input.h"
+#include "util/Enums.h"
 
 namespace BR {
 

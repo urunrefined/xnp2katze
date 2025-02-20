@@ -1,16 +1,16 @@
 #include "VKSync.h"
 #include <assert.h>
-#include <stdexcept>
+#include <stdio.h>
 
 namespace BR {
 
-VulkanSemaphore::VulkanSemaphore(const VkDevice &device_) : device(device_) {
+VulkanSemaphore::VulkanSemaphore(VkDevice device) : device(device) {
     VkSemaphoreCreateInfo semaphoreInfo = {};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &semaphore) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create semaphore!");
+        throw "failed to create semaphore!";
     }
 }
 
@@ -18,7 +18,7 @@ VulkanSemaphore::~VulkanSemaphore() {
     vkDestroySemaphore(device, semaphore, nullptr);
 }
 
-VulkanFence::VulkanFence(const VkDevice &device_) : device(device_) {
+VulkanFence::VulkanFence(VkDevice device) : device(device) {
     VkFenceCreateInfo fenceCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .pNext = nullptr,
@@ -26,7 +26,7 @@ VulkanFence::VulkanFence(const VkDevice &device_) : device(device_) {
 
     if (vkCreateFence(device, &fenceCreateInfo, nullptr, &fence) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create fence!");
+        throw "failed to create fence!";
     }
 }
 
@@ -36,7 +36,7 @@ VkResult VulkanFence::wait() {
     return vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
 }
 
-Sitter::Sitter(const VkDevice &device_) : device(device_) {
+Sitter::Sitter(VkDevice device) : device(device) {
     assert(state == SitterState::INACTIVE);
 
     VkFenceCreateInfo fenceCreateInfo = {
@@ -46,7 +46,7 @@ Sitter::Sitter(const VkDevice &device_) : device(device_) {
 
     if (vkCreateFence(device, &fenceCreateInfo, nullptr, &fence) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create fence!");
+        throw "failed to create fence!";
     }
 }
 

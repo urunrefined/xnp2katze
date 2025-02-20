@@ -2,14 +2,13 @@
 #include "util/Core.h"
 #include "util/Matrix4x4.h"
 
-#include <stdexcept>
 #include <string.h>
 #include <vector>
 
 namespace BR {
 
-VulkanDescriptorLayoutExt::VulkanDescriptorLayoutExt(const VkDevice &device_)
-    : device(device_) {
+VulkanDescriptorLayoutExt::VulkanDescriptorLayoutExt(VkDevice device)
+    : device(device) {
     VkDescriptorSetLayoutBinding samplerLayoutBinding[3]{};
 
     samplerLayoutBinding[0].binding = 0;
@@ -38,7 +37,7 @@ VulkanDescriptorLayoutExt::VulkanDescriptorLayoutExt(const VkDevice &device_)
 
     if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &layout) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor set layout!");
+        throw "failed to create descriptor set layout!";
     }
 }
 
@@ -50,23 +49,29 @@ template <class T1>
 static VkDeviceSize getUniformSize(const VulkanPhysicalDevice &physicalDevice) {
     VkDeviceSize alignment =
         physicalDevice.getMinUniformBufferOffsetAlignment();
-    return (sizeof(T1) + alignment) - (sizeof(T1) % alignment);
+
+    if (sizeof(T1) % alignment) {
+        return sizeof(T1) + (alignment - (sizeof(T1) % alignment));
+    }
+
+    return sizeof(T1);
+}
+
+size_t
+VulkanDescriptorSetExt::getChunkSize(VulkanPhysicalDevice &physicalDevice,
+                                     uint32_t modelCount) {
+    return getUniformSize<Matrix4x4f>(physicalDevice) +
+           getUniformSize<Matrix4x4f>(physicalDevice) * modelCount;
 }
 
 VulkanDescriptorSetExt::VulkanDescriptorSetExt(
-    const VkDevice &device_, VulkanPhysicalDevice &physicalDevice_,
-    VkImageView &imageView, VkSampler &sampler,
-    const VkDescriptorPool &descriptorPoolExt_,
-    const VkDescriptorSetLayout &layout, size_t modelCount_)
-    : device(device_), physicalDevice(physicalDevice_),
-      descriptorPoolExt(descriptorPoolExt_),
-      uniformBuffer(device, physicalDevice,
-                    getUniformSize<Matrix4x4f>(physicalDevice) +
-                        getUniformSize<Matrix4x4f>(physicalDevice) *
-                            modelCount_),
-      modelCount(modelCount_)
-
-{
+    VkDevice device, VulkanPhysicalDevice &physicalDevice,
+    const UniformChunk &chunk, VkImageView imageView, VkSampler sampler,
+    VkDescriptorPool descriptorPoolExt, VkDescriptorSetLayout layout,
+    size_t modelCount)
+    : device(device), physicalDevice(physicalDevice),
+      descriptorPoolExt(descriptorPoolExt), chunk(chunk),
+      modelCount(modelCount) {
     std::vector<VkDescriptorSetLayout> layouts(modelCount, layout);
 
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -79,7 +84,7 @@ VulkanDescriptorSetExt::VulkanDescriptorSetExt(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate descriptor sets!");
+        throw "failed to allocate descriptor sets!";
     }
 
     VkDescriptorImageInfo imageInfo{};
@@ -89,8 +94,9 @@ VulkanDescriptorSetExt::VulkanDescriptorSetExt(
 
     VkDescriptorBufferInfo worldBufferInfo{};
 
-    worldBufferInfo.buffer = uniformBuffer;
-    worldBufferInfo.offset = getUniformSize<Matrix4x4f>(physicalDevice) * 0;
+    worldBufferInfo.buffer = chunk.buffer;
+    worldBufferInfo.offset =
+        getUniformSize<Matrix4x4f>(physicalDevice) * 0 + chunk.bufferOffset;
     worldBufferInfo.range = sizeof(Matrix4x4f);
 
     VkWriteDescriptorSet descriptorWrite[3]{};
@@ -109,9 +115,10 @@ VulkanDescriptorSetExt::VulkanDescriptorSetExt(
 
         VkDescriptorBufferInfo modelBufferInfo{};
 
-        modelBufferInfo.buffer = uniformBuffer;
+        modelBufferInfo.buffer = chunk.buffer;
         modelBufferInfo.offset =
-            getUniformSize<Matrix4x4f>(physicalDevice) * (i + 1);
+            getUniformSize<Matrix4x4f>(physicalDevice) * (i + 1) +
+            chunk.bufferOffset;
         modelBufferInfo.range = sizeof(Matrix4x4f);
 
         descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -138,15 +145,14 @@ VulkanDescriptorSetExt::VulkanDescriptorSetExt(
 }
 
 void VulkanDescriptorSetExt::updateWorldMatrix(const Matrix4x4f &world) {
-    uniformBuffer.update((const char *)world.getData(), 0, sizeof(float) * 16);
+    chunk.update((const char *)world.getData(), 0, sizeof(float) * 16);
 }
 
 void VulkanDescriptorSetExt::updateModelMatrix(const Matrix4x4f &model,
                                                size_t index) {
-    uniformBuffer.update((const char *)model.getData(),
-                         getUniformSize<Matrix4x4f>(physicalDevice) *
-                             (index + 1),
-                         sizeof(float) * 16);
+    chunk.update((const char *)model.getData(),
+                 getUniformSize<Matrix4x4f>(physicalDevice) * (index + 1),
+                 sizeof(float) * 16);
 }
 
 VulkanDescriptorSetExt::~VulkanDescriptorSetExt() {

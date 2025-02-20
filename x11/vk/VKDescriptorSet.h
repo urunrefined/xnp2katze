@@ -5,27 +5,25 @@
 namespace BR {
 
 class VulkanDescriptorLayout {
-    const VkDevice &device;
+    VkDevice device;
     VkDescriptorSetLayout layout;
 
   public:
-    VulkanDescriptorLayout(const VkDevice &device_);
+    VulkanDescriptorLayout(VkDevice device);
     ~VulkanDescriptorLayout();
 
     operator const VkDescriptorSetLayout &() const { return layout; }
 };
 
 class VulkanDescriptorSet {
-    const VkDevice &device;
-    const VkDescriptorPool &descriptorPool;
-
+    VkDevice device;
+    VkDescriptorPool descriptorPool;
     VkDescriptorSet descriptorSet;
 
   public:
-    VulkanDescriptorSet(const VkDevice &device_, VkImageView &imageView,
-                        VkSampler &sampler,
-                        const VkDescriptorPool &descriptorPool_,
-                        const VkDescriptorSetLayout &layout);
+    VulkanDescriptorSet(VkDevice device, VkImageView imageView,
+                        VkSampler sampler, VkDescriptorPool descriptorPool,
+                        VkDescriptorSetLayout layout);
 
     ~VulkanDescriptorSet();
 

@@ -1,11 +1,13 @@
-#include "VKSwapchainImages.h"
-
+#include "VKSwapChain.h"
 #include "VKUtil.h"
+
 #include "util/Bitset.h"
+
+#include <stdio.h>
 
 #include <array>
 #include <limits>
-#include <stdexcept>
+#include <vector>
 
 namespace BR {
 
@@ -29,7 +31,7 @@ static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
 static VkPresentModeKHR chooseSwapPresentMode(
     const std::vector<VkPresentModeKHR> availablePresentModes) {
     if (availablePresentModes.size() == 0) {
-        throw std::runtime_error("No presentmode found on card ");
+        throw "No presentmode found on card";
     }
 
     Bitset<4> supported;
@@ -58,7 +60,7 @@ static VkPresentModeKHR chooseSwapPresentMode(
         }
     }
 
-    throw std::runtime_error("No supported presentmode found");
+    throw "No supported presentmode found";
 }
 
 static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities,
@@ -80,27 +82,23 @@ static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities,
     }
 }
 
-VulkanSwapchainImages::VulkanSwapchainImages(
-    const VkPhysicalDevice &physicalDevice_, VkDevice &device_,
-    VkSurfaceKHR &surface_, uint32_t width, uint32_t height,
-    uint32_t graphicsFamily_, uint32_t presentFamily_)
-    : physicalDevice(physicalDevice_), device(device_), surface(surface_),
-      swapChain(VK_NULL_HANDLE), graphicsFamily(graphicsFamily_),
-      presentFamily(presentFamily_) {
-    reCreate(width, height);
-}
-
-void VulkanSwapchainImages::reCreate(uint32_t width, uint32_t height) {
+VulkanSwapChain::VulkanSwapChain(VkDevice device,
+                                 VkPhysicalDevice physicalDevice,
+                                 uint32_t graphicsFamily,
+                                 uint32_t presentFamily, VkSurfaceKHR surface,
+                                 uint32_t width, uint32_t height,
+                                 VulkanSwapChain *oldSwapChain)
+    : device(device) {
     SwapChainSupportDetails swapChainSupport(physicalDevice, surface);
 
     VkSurfaceFormatKHR surfaceFormat =
         chooseSwapSurfaceFormat(swapChainSupport.formats);
-    swapChainImageFormat = surfaceFormat.format;
+
+    format = surfaceFormat.format;
 
     VkPresentModeKHR presentMode =
         chooseSwapPresentMode(swapChainSupport.presentModes);
-    swapChainExtent =
-        chooseSwapExtent(swapChainSupport.capabilities, width, height);
+    extent = chooseSwapExtent(swapChainSupport.capabilities, width, height);
 
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
     if (swapChainSupport.capabilities.maxImageCount > 0 &&
@@ -113,14 +111,14 @@ void VulkanSwapchainImages::reCreate(uint32_t width, uint32_t height) {
     createInfo.surface = surface;
 
     createInfo.minImageCount = imageCount;
-    createInfo.imageFormat = swapChainImageFormat;
+    createInfo.imageFormat = format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = swapChainExtent;
+    createInfo.imageExtent = extent;
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    printf("Recreate swapchain with dimensions %u %u\n", swapChainExtent.width,
-           swapChainExtent.height);
+    printf("Recreate swapchain with dimensions %u %u\n", extent.width,
+           extent.height);
 
     uint32_t queueFamilyIndices[] = {graphicsFamily, presentFamily};
 
@@ -137,27 +135,19 @@ void VulkanSwapchainImages::reCreate(uint32_t width, uint32_t height) {
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
 
-    createInfo.oldSwapchain = swapChain;
-    VkSwapchainKHR newSwapChain;
+    if (oldSwapChain) {
+        createInfo.oldSwapchain = oldSwapChain->swapChain;
+    } else {
+        createInfo.oldSwapchain = nullptr;
+    }
 
-    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &newSwapChain) !=
+    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create swap chain!");
+        throw "failed to create swap chain!";
     }
-
-    if (swapChain != VK_NULL_HANDLE) {
-        vkDestroySwapchainKHR(device, swapChain, nullptr);
-    }
-
-    swapChain = newSwapChain;
-
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
-    swapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount,
-                            swapChainImages.data());
 }
 
-VulkanSwapchainImages::~VulkanSwapchainImages() {
+VulkanSwapChain::~VulkanSwapChain() {
     vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 

@@ -1,19 +1,16 @@
 #include "VKCommandPool.h"
 
-#include <stdexcept>
-
 namespace BR {
 
-VulkanCommandPool::VulkanCommandPool(const VkDevice &device_,
-                                     uint32_t graphicsFamily)
-    : device(device_) {
+VulkanCommandPool::VulkanCommandPool(VkDevice device, uint32_t graphicsFamily)
+    : device(device) {
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = graphicsFamily;
 
     if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create graphics command pool!");
+        throw "failed to create graphics command pool!";
     }
 }
 

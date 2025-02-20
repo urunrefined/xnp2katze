@@ -1,12 +1,11 @@
 #include "VKDescriptorSet.h"
 
-#include <stdexcept>
 #include <vector>
 
 namespace BR {
 
-VulkanDescriptorLayout::VulkanDescriptorLayout(const VkDevice &device_)
-    : device(device_) {
+VulkanDescriptorLayout::VulkanDescriptorLayout(VkDevice device)
+    : device(device) {
     VkDescriptorSetLayoutBinding samplerLayoutBinding{};
     samplerLayoutBinding.binding = 2;
     samplerLayoutBinding.descriptorCount = 1;
@@ -22,7 +21,7 @@ VulkanDescriptorLayout::VulkanDescriptorLayout(const VkDevice &device_)
 
     if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &layout) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor set layout!");
+        throw "failed to create descriptor set layout!";
     }
 }
 
@@ -30,11 +29,11 @@ VulkanDescriptorLayout::~VulkanDescriptorLayout() {
     vkDestroyDescriptorSetLayout(device, layout, 0);
 }
 
-VulkanDescriptorSet::VulkanDescriptorSet(
-    const VkDevice &device_, VkImageView &imageView, VkSampler &sampler,
-    const VkDescriptorPool &descriptorPool_,
-    const VkDescriptorSetLayout &layout)
-    : device(device_), descriptorPool(descriptorPool_) {
+VulkanDescriptorSet::VulkanDescriptorSet(VkDevice device, VkImageView imageView,
+                                         VkSampler sampler,
+                                         VkDescriptorPool descriptorPool,
+                                         VkDescriptorSetLayout layout)
+    : device(device), descriptorPool(descriptorPool) {
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
@@ -43,7 +42,7 @@ VulkanDescriptorSet::VulkanDescriptorSet(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate descriptor sets!");
+        throw "failed to allocate descriptor sets!";
     }
 
     VkDescriptorImageInfo imageInfo{};

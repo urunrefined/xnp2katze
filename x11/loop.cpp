@@ -1,6 +1,22 @@
+#include "vk/VKDebug.h"
+#include "vk/VKDescriptorLayouts.h"
 #include "vk/VKDescriptorPool.h"
-#include "vk/VKEngine.h"
+#include "vk/VKDescriptorPoolExt.h"
+#include "vk/VKDevice.h"
+#include "vk/VKInstance.h"
 #include "vk/VKPhysicalDeviceEnumerations.h"
+#include "vk/VKSampler.h"
+#include "vk/VKScaler.h"
+#include "vk/VKShaders.h"
+#include "vk/VKSwapChain.h"
+#include "vk/VKSwapChainFramebuffers.h"
+#include "vk/VKUtil.h"
+
+#include "glfw/VKGLFW.h"
+#include "glfw/VKSurface.h"
+
+#include "gl/GLConsole.h"
+#include "gl/GLGlyphCache.h"
 
 #include "pulse/PulseSoundEngine.h"
 
@@ -15,33 +31,18 @@
 
 namespace BR {
 
-static VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanContext &engine) {
-    BR::VulkanPhysicalDeviceEnumerations physicalDeviceEnums(engine.instance);
+#ifdef VKDEBUG
+static int vkdebug = 1;
+#else
+static int vkdebug = 0;
+#endif
 
-    for (BR::VulkanPhysicalDevice &physicalDevice :
-         physicalDeviceEnums.physicalDevices) {
-        // Use the first one available
-
-        if (physicalDevice.isDeviceSuitable(engine.surface)) {
-            return physicalDevice;
-        }
-    }
-
-    throw Exception("No graphics device suitable");
-}
+static const char *validationLayerString = "VK_LAYER_KHRONOS_validation";
 
 static const unsigned int pc98Width = 640;
 static const unsigned int pc98Height = 400;
 
-static Vec2 posstatic[6]{
-    {-1.0, 1.0},  // lower left
-    {-1.0, -1.0}, // upper left
-    {1.0, -1.0},  // upper right
-
-    {-1.0, 1.0}, // lower left
-    {1.0, -1.0}, // upper right
-    {1.0, 1.0}   // lower right
-};
+/*
 
 static void glLoop(SignalFD &sfd, InputMapper &inputMapper,
                    VulkanContext &engine, VulkanPhysicalDevice &physicalDevice,
@@ -83,7 +84,7 @@ static void glLoop(SignalFD &sfd, InputMapper &inputMapper,
             renderBuffer->begin(scaler.getRenderPass(), scaler.swapchain);
 
             if (visualScreen == VisualScreen::CFG) {
-            
+
             } else {
                 if (mode == ViewPortMode::ASPECT) {
                     scaler.renderer.pipelineAspect->record(
@@ -118,19 +119,227 @@ static void glLoop(SignalFD &sfd, InputMapper &inputMapper,
     }
 
     vkDeviceWaitIdle(scaler.device);
-}
+}*/
 
 void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
           Sfx::PulseSoundEngine &soundEngine) {
-#ifndef VKDEBUG
-    VulkanContext engine(false);
-#else
-    VulkanContext engine(true);
-#endif
-    VulkanPhysicalDevice physicalDevice = glPhysicalDeviceSelection(engine);
 
-    glLoop(sfd, inputMapper, engine, physicalDevice,
-           soundEngine, cfg, oscfg);
+    vkdebug = 1;
+
+    GLFWContext glfwContext(640, 400);
+
+    auto extensions = getRequiredGLFWExtensions();
+    std::vector<const char *> layers;
+
+    if (vkdebug) {
+        extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+        layers.push_back(validationLayerString);
+    }
+
+    VulkanInstance instance(extensions, layers);
+    VulkanDebugCallback callback(instance, vkdebug);
+    VulkanSurface surface(glfwContext, instance);
+
+    VulkanPhysicalDevice physicalDevice =
+        glPhysicalDeviceSelection(instance, surface);
+
+    VulkanDevice device(vkdebug, physicalDevice, surface,
+                        physicalDevice.queueFamilies);
+
+    ShaderStore shaderStore(device);
+
+    VulkanDescriptorLayouts layouts(device);
+
+    VulkanDescriptorPoolExt descriptorPoolExt(device, 32);
+    VulkanSampler sampler(physicalDevice, device, VK_FILTER_NEAREST);
+    size_t usSize = VulkanDescriptorSetExt::getChunkSize(physicalDevice, 32);
+
+    VkFormat renderDepthFormat = findDepthFormat(physicalDevice);
+
+    // TODO: UniformBuffer needs to be newly calculated
+    VulkanUniformBuffer uniformBuffer(device, physicalDevice, 2 * 1024 * 1024);
+    UniformAllocator ua(uniformBuffer);
+
+    GlyphCache glyphCache(physicalDevice, device);
+
+    VulkanVtxBuffer vtx(device, physicalDevice, 1024 * 1024 * 20);
+    DataAllocator alc(vtx);
+
+    std::string fontfile = getFont();
+    printf("using font %s\n", fontfile.c_str());
+    Font font(fontfile.c_str(), 128);
+
+    FontContext fontContext{glyphCache.textGlyphMappingCache,
+                            glyphCache.imageIndexed, font.freetypeFace,
+                            font.hbfont};
+
+    GLConsole console(alc, fontContext, 80, device, physicalDevice, ua, sampler,
+                      layouts, glyphCache.alphaTexture.textureView);
+
+    std::vector<VulkanCmbBuffer *> cmbBuffers;
+    cmbBuffers.push_back(&vtx);
+    cmbBuffers.push_back(&uniformBuffer);
+
+    std::vector<VulkanTextureGeneric *> textures;
+    textures.push_back(&glyphCache.alphaTexture);
+
+    auto dims = glfwContext.getCurrentSize();
+
+    std::vector<uint32_t> codePoints;
+
+    std::unique_ptr<VulkanSwapChain> swapChain(
+        std::make_unique<VulkanSwapChain>(
+            device, physicalDevice, device.graphicsFamily, device.presentFamily,
+            surface, glfwContext.currentWidth, glfwContext.currentHeight,
+            nullptr));
+
+    std::unique_ptr<VulkanRenderPass> renderPass(
+        std::make_unique<VulkanRenderPass>(
+            device, swapChain->format, renderDepthFormat, ShouldPresent::YES));
+
+    std::unique_ptr<VulkanSwapChainFramebuffers> swapChainFramebuffers(
+        std::make_unique<VulkanSwapChainFramebuffers>(device, physicalDevice,
+                                                      *swapChain, *renderPass,
+                                                      renderDepthFormat));
+
+    std::unique_ptr<VulkanRenderer> renderer(std::make_unique<VulkanRenderer>(
+        physicalDevice, device, shaderStore, swapChain->extent, *renderPass,
+        layouts));
+
+    VulkanScaler scaler(device);
+
+    std::unique_ptr<VulkanRenderBuffer> renderBuffer;
+
+    console.ready();
+
+    bool needsUpdate = true;
+    bool needsSwapchainUpdate = false;
+
+    std::vector<char> img(pc98Width * pc98Height * 4, 255);
+
+    VulkanDescriptorPool descriptorPool(scaler.device, 1);
+
+    VulkanTextureBGRA mainTexture(device, physicalDevice, pc98Width,
+                                  pc98Height);
+
+    textures.push_back(&mainTexture);
+
+    VulkanDescriptorSet descriptorSetMain(
+        scaler.device, mainTexture.textureView, sampler, descriptorPool,
+        layouts.descriptorLayout);
+
+    CallbackContext ctx{
+        {pc98Width, pc98Height, img.data()}, &glfwContext.input, false};
+
+    while (glfwContext.getWindowState() != WindowState::SHOULDCLOSE &&
+           !sfd.isTriggered()) {
+
+        mainloop(&ctx, &soundEngine);
+
+        if (!needsSwapchainUpdate && !needsUpdate) {
+            // glfwContext.wait(1);
+        }
+
+        auto nDims = glfwContext.getCurrentSize();
+
+        glfwContext.pollWindowEvents();
+
+        if (nDims != dims) {
+            needsSwapchainUpdate = true;
+            dims = nDims;
+        }
+
+        GLFWInput &input = glfwContext.input;
+
+        if (!input.codepoints.empty()) {
+            console.add(input.codepoints);
+            needsUpdate = true;
+        }
+
+        input.reset();
+
+        if (scaler.renderingComplete()) {
+            bool hasData = false;
+
+            if (ctx.dirty) {
+
+                ctx.dirty = false;
+
+                memcpy(mainTexture.data, img.data(), img.size());
+
+                for (size_t i = 3; i < img.size(); i += 4) {
+                    ((char *)mainTexture.data)[i] = 255;
+                }
+
+                mainTexture.dirty();
+                needsUpdate = true;
+            }
+
+            if (needsSwapchainUpdate) {
+                if (glfwContext.currentWidth == 0 ||
+                    glfwContext.currentHeight == 0) {
+                    continue;
+                }
+
+                swapChain = std::make_unique<VulkanSwapChain>(
+                    device, physicalDevice, device.graphicsFamily,
+                    device.presentFamily, surface, glfwContext.currentWidth,
+                    glfwContext.currentHeight, swapChain.get());
+
+                renderPass = std::make_unique<VulkanRenderPass>(
+                    device, swapChain->format, renderDepthFormat,
+                    ShouldPresent::YES);
+
+                swapChainFramebuffers =
+                    std::make_unique<VulkanSwapChainFramebuffers>(
+                        device, physicalDevice, *swapChain, *renderPass,
+                        renderDepthFormat);
+
+                renderer = std::make_unique<VulkanRenderer>(
+                    physicalDevice, device, shaderStore, swapChain->extent,
+                    *renderPass, layouts);
+
+                needsSwapchainUpdate = false;
+                needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+                renderBuffer = std::make_unique<VulkanRenderBuffer>(
+                    device, device.graphicsFamily);
+
+                renderBuffer->begin(*renderPass,
+                                    swapChainFramebuffers->framebuffers,
+                                    swapChain->extent);
+
+                renderer->pipelineInteger->record(
+                    renderBuffer->commandBuffers.data(),
+                    renderBuffer->commandBuffers.size(), descriptorSetMain, 6);
+
+                /*
+                console.draw(*renderer, renderBuffer->commandBuffers.data(),
+                             renderBuffer->commandBuffers.size());
+                */
+
+                renderBuffer->end();
+
+                auto drawRet = scaler.draw(*renderBuffer, cmbBuffers, textures,
+                                           *swapChain);
+
+                if (drawRet.state == RenderState::NEEDSSWAPCHAINUPDATE) {
+                    needsSwapchainUpdate = true;
+                } else if (drawRet.state == RenderState::OK) {
+                    scaler.present(drawRet.index, *swapChain);
+                    needsUpdate = false;
+                }
+            }
+        }
+    }
+
+    while (!scaler.renderingComplete()) {
+        usleep(1000);
+    }
+
+    vkDeviceWaitIdle(device);
 }
 
 } // namespace BR

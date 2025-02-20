@@ -5,11 +5,11 @@
 namespace BR {
 
 class VulkanDescriptorPoolExt {
-    const VkDevice &device;
+    VkDevice device;
     VkDescriptorPool descriptorPool;
 
   public:
-    VulkanDescriptorPoolExt(const VkDevice &device_, uint32_t descriptorCount);
+    VulkanDescriptorPoolExt(VkDevice device, uint32_t descriptorCount);
 
     ~VulkanDescriptorPoolExt();
 

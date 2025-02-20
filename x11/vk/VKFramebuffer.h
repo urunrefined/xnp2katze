@@ -8,15 +8,16 @@ namespace BR {
 
 class VulkanFramebuffer {
     VkFramebuffer framebuffer;
-    const VkDevice &device;
+    VkDevice device;
 
   public:
     VulkanFramebuffer(const VulkanFramebuffer &imageView) = delete;
-    VulkanFramebuffer(const VkDevice &device_, VkExtent2D swapChainExtent,
-                      VkRenderPass &renderPass,
+    VulkanFramebuffer(VkDevice device, const VkExtent2D &extent,
+                      VkRenderPass renderPass,
                       std::array<VkImageView, 2> &attachments);
-    VulkanFramebuffer(const VkDevice &device_, VkExtent2D extent,
-                      VkRenderPass &renderPass, VkImageView &attachment);
+
+    VulkanFramebuffer(VkDevice device, const VkExtent2D &extent,
+                      VkRenderPass renderPass, VkImageView attachment);
 
     ~VulkanFramebuffer();
 

@@ -2,18 +2,15 @@
 
 #include <vulkan/vulkan.h>
 
-#include <stdexcept>
-
 namespace BR {
 
 class VulkanImageMemory {
-    const VkDevice &device;
+    VkDevice device;
     VkDeviceMemory imageMemory;
 
   public:
-    VulkanImageMemory(const VkPhysicalDevice &physicalDevice,
-                      const VkDevice &device_, VkImage image,
-                      VkMemoryPropertyFlags properties);
+    VulkanImageMemory(VkPhysicalDevice physicalDevice, VkDevice device,
+                      VkImage image, VkMemoryPropertyFlags properties);
 
     ~VulkanImageMemory();
 

@@ -1,12 +1,14 @@
 #include "VKCommandBuffer.h"
 
+#include <stdio.h>
+
 namespace BR {
 
-VulkanCommandBuffer::VulkanCommandBuffer(const VkDevice &device_,
-                                         const VkCommandPool &commandPool_,
-                                         VkQueue graphicsQueue_)
-    : device(device_), commandPool(commandPool_),
-      graphicsQueue(graphicsQueue_) {
+VulkanCommandBuffer::VulkanCommandBuffer(VkDevice device,
+                                         VkCommandPool commandPool,
+                                         VkQueue graphicsQueue)
+    : device(device), commandPool(commandPool), graphicsQueue(graphicsQueue) {
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -33,6 +35,8 @@ void VulkanCommandBuffer::submit() {
     vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(graphicsQueue);
 }
+
+void VulkanCommandBuffer::end() { vkEndCommandBuffer(commandBuffer); }
 
 VulkanCommandBuffer::~VulkanCommandBuffer() {
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);

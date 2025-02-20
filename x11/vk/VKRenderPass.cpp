@@ -1,27 +1,34 @@
 #include "VKRenderPass.h"
-#include "vk/VKUtil.h"
 
 #include <array>
-#include <stdexcept>
+
+#include <stdio.h>
 
 namespace BR {
 
-VulkanRenderPass::VulkanRenderPass(const VkDevice &device_,
-                                   const VkPhysicalDevice &physicalDevice,
-                                   VkFormat swapChainImageFormat)
-    : device(device_) {
+VulkanRenderPass::VulkanRenderPass(const VkDevice device, VkFormat colorFormat,
+                                   VkFormat depthFormat, ShouldPresent present)
+    : device(device) {
     VkAttachmentDescription colorAttachment = {};
-    colorAttachment.format = swapChainImageFormat;
+    colorAttachment.format = colorFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    if (present == ShouldPresent::YES) {
+        printf("PRESENT_SRC\n");
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    } else {
+        printf("SRC_OPTIMAL\n");
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    }
 
     VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = findDepthFormat(physicalDevice);
+    depthAttachment.format = depthFormat;
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -41,9 +48,11 @@ VulkanRenderPass::VulkanRenderPass(const VkDevice &device_,
     subpass.pColorAttachments = &colorAttachmentRef;
 
     VkSubpassDependency dependency = {};
+
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    dependency.srcStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
     dependency.srcAccessMask = 0;
     dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
@@ -62,7 +71,7 @@ VulkanRenderPass::VulkanRenderPass(const VkDevice &device_,
 
     if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create render pass!");
+        throw "failed to create render pass!";
     }
 }
 

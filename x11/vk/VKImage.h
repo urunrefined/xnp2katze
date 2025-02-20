@@ -5,12 +5,12 @@
 namespace BR {
 
 class VulkanImage {
-    const VkDevice &device;
+    VkDevice device;
 
   public:
     VkImage image;
 
-    VulkanImage(const VkDevice &device_, uint32_t width, uint32_t height,
+    VulkanImage(VkDevice device, uint32_t width, uint32_t height,
                 VkFormat format, VkImageUsageFlags usage);
     ~VulkanImage();
 

@@ -1,12 +1,10 @@
 #include "VKDescriptorPool.h"
 
-#include <stdexcept>
-
 namespace BR {
 
-VulkanDescriptorPool::VulkanDescriptorPool(const VkDevice &device_,
+VulkanDescriptorPool::VulkanDescriptorPool(VkDevice device,
                                            uint32_t descriptorCount)
-    : device(device_) {
+    : device(device) {
     VkDescriptorPoolSize poolSize;
 
     poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -21,7 +19,7 @@ VulkanDescriptorPool::VulkanDescriptorPool(const VkDevice &device_,
 
     if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor pool!");
+        throw "failed to create descriptor pool!";
     }
 }
 

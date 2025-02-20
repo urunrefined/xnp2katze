@@ -1,12 +1,9 @@
 #include "VKRenderBuffer.h"
-#include "VKSwapchain.h"
-
-#include <stdexcept>
 
 namespace BR {
 
 static void beginVulkanRendering(
-    const VulkanDevice &device, VulkanCommandPool &commandPool,
+    VkDevice device, VulkanCommandPool &commandPool,
     std::vector<std::unique_ptr<VulkanFramebuffer>> &framebuffers,
     std::vector<VkCommandBuffer> &commandBuffers, VkExtent2D extent,
     VulkanRenderPass &renderPass) {
@@ -26,7 +23,7 @@ static void beginVulkanRendering(
 
     if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
+        throw "failed to allocate command buffers!";
     }
 
     for (size_t i = 0; i < commandBuffers.size(); i++) {
@@ -60,15 +57,17 @@ static void endVulkanRendering(std::vector<VkCommandBuffer> &commandBuffers) {
         vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
+            throw "failed to record command buffer!";
         }
     }
 }
 
-void VulkanRenderBuffer::begin(VulkanRenderPass &renderPass,
-                               VulkanSwapchain &swapChain) {
-    beginVulkanRendering(device, commandPool, swapChain.swapChainFramebuffers,
-                         commandBuffers, swapChain.extent, renderPass);
+void VulkanRenderBuffer::begin(
+    VulkanRenderPass &renderPass,
+    std::vector<std::unique_ptr<VulkanFramebuffer>> &framebuffers,
+    VkExtent2D extent) {
+    beginVulkanRendering(device, commandPool, framebuffers, commandBuffers,
+                         extent, renderPass);
 }
 
 void VulkanRenderBuffer::end() { endVulkanRendering(commandBuffers); }

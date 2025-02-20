@@ -1,13 +1,14 @@
 #pragma once
 
 #include "glfw/Input.h"
-#include "vk/VKTexture.h"
+#include "util/Image.h"
 
 namespace BR {
 
 struct CallbackContext {
-    VulkanTexture *texture;
+    ImageBGRA image;
     Input *input;
+    bool dirty;
 };
 
 } // namespace BR

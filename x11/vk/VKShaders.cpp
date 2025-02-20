@@ -8,8 +8,7 @@ static std::vector<char> readFile(const std::string &filename) {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {
-        throw std::runtime_error(std::string("failed to open file!") +
-                                 filename);
+        throw std::string("failed to open file!") + filename;
     }
 
     size_t fileSize = (size_t)file.tellg();
@@ -36,8 +35,8 @@ static std::vector<char> readShaderFile(const char *filename) {
     }
 }
 
-ShaderStage::ShaderStage(const VkDevice &device_, const std::vector<char> &code)
-    : device(device_) {
+ShaderStage::ShaderStage(VkDevice device, const std::vector<char> &code)
+    : device(device) {
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
@@ -45,7 +44,7 @@ ShaderStage::ShaderStage(const VkDevice &device_, const std::vector<char> &code)
 
     if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create shader module!");
+        throw "failed to create shader module!";
     }
 }
 
@@ -55,12 +54,17 @@ ShaderStage::~ShaderStage() {
 
 ShaderStage::operator VkShaderModule &() { return shaderModule; }
 
-ShaderStore::ShaderStore(const VkDevice &device)
-    : vertTri(device, readShaderFile("vertTri.spv")),
-      fragTri(device, readShaderFile("fragTri.spv")),
-      vertTexExt(device, readShaderFile("vertTexExt.spv")),
-      vertTex(device, readShaderFile("vertTex.spv")),
-      fragTex(device, readShaderFile("fragTex.spv")) {}
+ShaderStore::ShaderStore(VkDevice device)
+    : vertTri(device, readShaderFile("vert/tri.spv")),
+      fragTri(device, readShaderFile("frag/tri.spv")),
+      vertTexExt(device, readShaderFile("vert/texExt.spv")),
+      vertTexExtColor(device, readShaderFile("vert/texExtColor.spv")),
+      vertTex(device, readShaderFile("vert/tex.spv")),
+      fragTex(device, readShaderFile("frag/tex.spv")),
+      fragTexIy(device, readShaderFile("frag/texIy.spv")),
+      fragTexIyColor(device, readShaderFile("frag/texIyColor.spv"))
+
+{}
 
 ShaderStore::~ShaderStore() {}
 

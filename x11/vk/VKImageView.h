@@ -6,15 +6,16 @@ namespace BR {
 
 class VulkanImageView {
     VkImageView imageView;
-    const VkDevice &device;
+    VkDevice device;
 
   public:
     VulkanImageView(const VulkanImageView &imageView) = delete;
 
-    VulkanImageView(const VkDevice &device_, VkImage image, VkFormat format,
+    VulkanImageView(VkDevice device, VkImage image, VkFormat format,
                     VkImageAspectFlags aspectFlags);
     ~VulkanImageView();
 
     operator VkImageView &() { return imageView; }
 };
+
 } // namespace BR

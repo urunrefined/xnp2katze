@@ -2,16 +2,16 @@
 
 namespace BR {
 
-VulkanSampler::VulkanSampler(const VkPhysicalDevice &physicalDevice,
-                             const VkDevice &device_)
-    : device(device_) {
+VulkanSampler::VulkanSampler(VkPhysicalDevice physicalDevice, VkDevice device,
+                             VkFilter filter)
+    : device(device) {
     VkPhysicalDeviceProperties properties{};
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.magFilter = VK_FILTER_NEAREST;
-    samplerInfo.minFilter = VK_FILTER_NEAREST;
+    samplerInfo.magFilter = filter;
+    samplerInfo.minFilter = filter;
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
@@ -25,7 +25,7 @@ VulkanSampler::VulkanSampler(const VkPhysicalDevice &physicalDevice,
 
     if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create texture sampler!");
+        throw "failed to create texture sampler!";
     }
 }
 

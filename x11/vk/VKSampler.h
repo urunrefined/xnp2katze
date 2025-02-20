@@ -2,18 +2,16 @@
 
 #include <vulkan/vulkan.h>
 
-#include <stdexcept>
-
 namespace BR {
 
 class VulkanSampler {
-    const VkDevice &device;
+    const VkDevice device;
 
   public:
     VkSampler sampler;
 
-    VulkanSampler(const VkPhysicalDevice &physicalDevice,
-                  const VkDevice &device_);
+    VulkanSampler(VkPhysicalDevice physicalDevice, VkDevice device,
+                  VkFilter filter = VK_FILTER_NEAREST);
 
     ~VulkanSampler();
 

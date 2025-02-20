@@ -1,7 +1,6 @@
 #include "VKPhysicalDevice.h"
 
 #include <set>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -10,7 +9,7 @@
 
 namespace BR {
 
-static bool checkSwapchainExtensionSupport(VkPhysicalDevice &device) {
+static bool checkSwapchainExtensionSupport(VkPhysicalDevice device) {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
                                          nullptr);
@@ -29,7 +28,7 @@ static bool checkSwapchainExtensionSupport(VkPhysicalDevice &device) {
     return false;
 }
 
-bool VulkanPhysicalDevice::isDeviceSuitable(VkSurfaceKHR &surface) {
+bool VulkanPhysicalDevice::isDeviceSuitable(VkSurfaceKHR surface) {
     if (!hasGraphicsQueue(physicalDevice, surface, queueFamilies))
         return false;
     if (!hasPresentQueue(physicalDevice, surface, queueFamilies))
@@ -46,8 +45,8 @@ bool VulkanPhysicalDevice::isDeviceSuitable(VkSurfaceKHR &surface) {
     return true;
 }
 
-VulkanPhysicalDevice::VulkanPhysicalDevice(VkPhysicalDevice physicalDevice_)
-    : physicalDevice(physicalDevice_) {
+VulkanPhysicalDevice::VulkanPhysicalDevice(VkPhysicalDevice physicalDevice)
+    : physicalDevice(physicalDevice) {
     vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
     printf("Device name %s\n", deviceProperties.deviceName);
 

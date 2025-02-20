@@ -1,13 +1,11 @@
 #include "VKImageView.h"
 
-#include <stdexcept>
-
 namespace BR {
 
-VulkanImageView::VulkanImageView(const VkDevice &device_, VkImage image,
+VulkanImageView::VulkanImageView(VkDevice device, VkImage image,
                                  VkFormat format,
                                  VkImageAspectFlags aspectFlags)
-    : device(device_) {
+    : device(device) {
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image = image;
@@ -21,7 +19,7 @@ VulkanImageView::VulkanImageView(const VkDevice &device_, VkImage image,
 
     if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) !=
         VK_SUCCESS) {
-        throw std::runtime_error("failed to create texture image view!");
+        throw "failed to create texture image view!";
     }
 }
 
