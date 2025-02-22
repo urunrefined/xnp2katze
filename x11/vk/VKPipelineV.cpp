@@ -13,12 +13,13 @@ static VkPipelineVertexInputStateCreateInfo getVertexInfo() {
 }
 
 PipelineV::PipelineV(VkDevice device, ShaderStore &shader3D,
-                     const VkRect2D &scissor, VkRenderPass renderPass)
+                     const RenderOptions &renderOptions,
+                     VkRenderPass renderPass)
     : pipelineLayout(device, 0),
       pipeline(device, shader3D.vertTri, shader3D.fragTri, getVertexInfo(),
-               scissor, renderPass, pipelineLayout.pipelineLayout, VK_TRUE,
-               VK_TRUE, VK_POLYGON_MODE_FILL,
-               VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST) {}
+               renderOptions.scissor, renderPass, pipelineLayout.pipelineLayout,
+               renderOptions.depth, renderOptions.blend, renderOptions.polyMode,
+               renderOptions.topology) {}
 
 PipelineV::~PipelineV() {}
 

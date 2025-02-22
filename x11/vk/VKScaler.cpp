@@ -124,8 +124,7 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
     (*commandBuffer).end();
 
     VkSubmitInfo submitInfo[2] = {};
-    VkPipelineStageFlags flagsWaitForImage =
-        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    VkPipelineStageFlags flagsWaitForImage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
     {
         VkSubmitInfo &updateSubmitInfo = submitInfo[0];
@@ -144,7 +143,8 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
             renderSemaphores.vboUpdatedSemaphore;
     }
 
-    VkPipelineStageFlags flagsWaitForVBOUpdate = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    VkPipelineStageFlags flagsWaitForVBOUpdate =
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     {
         VkSubmitInfo &drawSubmitInfo = submitInfo[1];

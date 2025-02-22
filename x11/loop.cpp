@@ -5,6 +5,7 @@
 #include "vk/VKDevice.h"
 #include "vk/VKInstance.h"
 #include "vk/VKPhysicalDeviceEnumerations.h"
+#include "vk/VKPipelineTex.h"
 #include "vk/VKSampler.h"
 #include "vk/VKScaler.h"
 #include "vk/VKShaders.h"
@@ -198,15 +199,24 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
             device, swapChain->format, renderDepthFormat, ShouldPresent::YES));
 
     std::unique_ptr<VulkanSwapChainFramebuffers> swapChainFramebuffers(
+
         std::make_unique<VulkanSwapChainFramebuffers>(device, physicalDevice,
                                                       *swapChain, *renderPass,
                                                       renderDepthFormat));
 
-    std::unique_ptr<VulkanRenderer> renderer(std::make_unique<VulkanRenderer>(
-        physicalDevice, device, shaderStore, swapChain->extent, *renderPass,
-        layouts));
+    RenderOptions renderOptions = {
 
-    VulkanScaler scaler(device);
+        VK_TRUE, VK_TRUE, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        VK_POLYGON_MODE_FILL,
+        getIntegerScissor(pc98Width, pc98Height, swapChain->extent.width,
+                          swapChain->extent.height)};
+
+    std::unique_ptr<PipelineTex> pipeline =
+        std::make_unique<PipelineTex>(device, shaderStore, renderOptions,
+                                      *renderPass, layouts.descriptorLayout);
+
+    std::unique_ptr<VulkanScaler> scaler =
+        std::make_unique<VulkanScaler>(device);
 
     std::unique_ptr<VulkanRenderBuffer> renderBuffer;
 
@@ -217,7 +227,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     std::vector<char> img(pc98Width * pc98Height * 4, 255);
 
-    VulkanDescriptorPool descriptorPool(scaler.device, 1);
+    VulkanDescriptorPool descriptorPool(scaler->device, 1);
 
     VulkanTextureBGRA mainTexture(device, physicalDevice, pc98Width,
                                   pc98Height);
@@ -225,7 +235,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
     textures.push_back(&mainTexture);
 
     VulkanDescriptorSet descriptorSetMain(
-        scaler.device, mainTexture.textureView, sampler, descriptorPool,
+        scaler->device, mainTexture.textureView, sampler, descriptorPool,
         layouts.descriptorLayout);
 
     CallbackContext ctx{
@@ -258,7 +268,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
         input.reset();
 
-        if (scaler.renderingComplete()) {
+        if (scaler->renderingComplete()) {
             bool hasData = false;
 
             if (ctx.dirty) {
@@ -295,9 +305,18 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                         device, physicalDevice, *swapChain, *renderPass,
                         renderDepthFormat);
 
-                renderer = std::make_unique<VulkanRenderer>(
-                    physicalDevice, device, shaderStore, swapChain->extent,
-                    *renderPass, layouts);
+                /*
+
+                         */
+
+                renderOptions.scissor = getIntegerScissor(pc98Width, pc98Height,
+                                  swapChain->extent.width,
+                                  swapChain->extent.height);
+                pipeline = std::make_unique<PipelineTex>(
+                    device, shaderStore, renderOptions, *renderPass,
+                    layouts.descriptorLayout);
+
+                scaler = std::make_unique<VulkanScaler>(device);
 
                 needsSwapchainUpdate = false;
                 needsUpdate = true;
@@ -311,9 +330,9 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                                     swapChainFramebuffers->framebuffers,
                                     swapChain->extent);
 
-                renderer->pipelineInteger->record(
-                    renderBuffer->commandBuffers.data(),
-                    renderBuffer->commandBuffers.size(), descriptorSetMain, 6);
+                pipeline->record(renderBuffer->commandBuffers.data(),
+                                 renderBuffer->commandBuffers.size(),
+                                 descriptorSetMain, 6);
 
                 /*
                 console.draw(*renderer, renderBuffer->commandBuffers.data(),
@@ -322,20 +341,20 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
                 renderBuffer->end();
 
-                auto drawRet = scaler.draw(*renderBuffer, cmbBuffers, textures,
-                                           *swapChain);
+                auto drawRet = scaler->draw(*renderBuffer, cmbBuffers, textures,
+                                            *swapChain);
 
                 if (drawRet.state == RenderState::NEEDSSWAPCHAINUPDATE) {
                     needsSwapchainUpdate = true;
                 } else if (drawRet.state == RenderState::OK) {
-                    scaler.present(drawRet.index, *swapChain);
+                    scaler->present(drawRet.index, *swapChain);
                     needsUpdate = false;
                 }
             }
         }
     }
 
-    while (!scaler.renderingComplete()) {
+    while (!scaler->renderingComplete()) {
         usleep(1000);
     }
 

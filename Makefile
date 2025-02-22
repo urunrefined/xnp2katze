@@ -256,7 +256,6 @@ SRC_CPP = \
 		x11/vk/VKBuffers.cpp                           \
 		x11/vk/VKSampler.cpp                           \
 		x11/vk/VKDescriptorLayouts.cpp                 \
-		x11/vk/VKRenderer.cpp                          \
 		x11/vk/VKDescriptorSet.cpp                     \
 		x11/vk/VKDescriptorSetExt.cpp                  \
 		x11/vk/VKDescriptorPool.cpp                    \

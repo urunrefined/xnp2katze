@@ -2,6 +2,8 @@
 
 #include "GLText.h"
 #include "util/FileListing.h"
+#include "vk/VKPipelineTexExtIyColor.h"
+#include "vk/VKSampler.h"
 
 #include <dirent.h>
 
@@ -57,16 +59,16 @@ class GLFileListing {
         }
     }
 
-    void draw(VulkanRenderer &renderer, VkCommandBuffer *commandBuffers,
+    void draw(PipelineTexExtIyColor &pipeline, VkCommandBuffer *commandBuffers,
               size_t bufferCount) {
         for (size_t i = 0; i < glListings.size; i++) {
 
             GLTextColors &text = glListings[i];
-            renderer.pipelineExtIyColor16to9->record(
-                commandBuffers, bufferCount, descriptorExtSetsMain.get(i),
-                *text.vtxs.gBuffer, text.vtxs.byteOffset, *text.uvs.gBuffer,
-                text.uvs.byteOffset, *text.colors.gBuffer,
-                text.colors.byteOffset, text.drawCount);
+            pipeline.record(commandBuffers, bufferCount,
+                            descriptorExtSetsMain.get(i), *text.vtxs.gBuffer,
+                            text.vtxs.byteOffset, *text.uvs.gBuffer,
+                            text.uvs.byteOffset, *text.colors.gBuffer,
+                            text.colors.byteOffset, text.drawCount);
         }
     }
 

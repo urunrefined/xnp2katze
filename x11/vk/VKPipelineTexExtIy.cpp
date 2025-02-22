@@ -39,13 +39,14 @@ static VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 };
 
 PipelineTexExtIy::PipelineTexExtIy(VkDevice device, ShaderStore &shader3D,
-                                   const VkRect2D &scissor,
+                                   const RenderOptions &renderOptions,
                                    VkRenderPass renderPass,
                                    VkDescriptorSetLayout desciptorSetLayout)
     : pipelineLayout(device, desciptorSetLayout),
       pipeline(device, shader3D.vertTexExt, shader3D.fragTexIy, vertexInputInfo,
-               scissor, renderPass, pipelineLayout, VK_TRUE, VK_TRUE,
-               VK_POLYGON_MODE_FILL, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+               renderOptions.scissor, renderPass, pipelineLayout,
+               renderOptions.depth, renderOptions.blend, renderOptions.polyMode,
+               renderOptions.topology)
 
 {}
 

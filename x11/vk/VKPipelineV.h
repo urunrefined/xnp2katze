@@ -2,6 +2,7 @@
 
 #include "VKPipeline.h"
 #include "VKRenderBuffer.h"
+#include "VKRenderOptions.h"
 #include "VKShaders.h"
 
 namespace BR {
@@ -12,8 +13,8 @@ class PipelineV {
     VulkanPipelineLayout pipelineLayout;
     VulkanPipeline pipeline;
 
-    PipelineV(VkDevice device, ShaderStore &shader3D, const VkRect2D &scissor,
-              VkRenderPass renderPass);
+    PipelineV(VkDevice device, ShaderStore &shader3D,
+              const RenderOptions &renderOptions, VkRenderPass renderPass);
 
     ~PipelineV();
 

@@ -2,6 +2,7 @@
 
 #include "VKPipeline.h"
 #include "VKRenderBuffer.h"
+#include "VKRenderOptions.h"
 #include "VKShaders.h"
 
 namespace BR {
@@ -13,7 +14,8 @@ class PipelineTexExtIy {
     VulkanPipeline pipeline;
 
     PipelineTexExtIy(VkDevice device, ShaderStore &shader3D,
-                     const VkRect2D &scissor, VkRenderPass renderPass,
+                     const RenderOptions &renderOptions,
+                     VkRenderPass renderPass,
                      VkDescriptorSetLayout desciptorSetLayout);
 
     ~PipelineTexExtIy();

@@ -13,13 +13,14 @@ static VkPipelineVertexInputStateCreateInfo getVertexInfo() {
 }
 
 PipelineTex::PipelineTex(VkDevice device, ShaderStore &shader3D,
-                         const VkRect2D &scissor, VkRenderPass renderPass,
+                         const RenderOptions &renderOptions,
+                         VkRenderPass renderPass,
                          VkDescriptorSetLayout desciptorSetLayout)
     : pipelineLayout(device, desciptorSetLayout),
       pipeline(device, shader3D.vertTex, shader3D.fragTex, getVertexInfo(),
-               scissor, renderPass, pipelineLayout.pipelineLayout, VK_TRUE,
-               VK_TRUE, VK_POLYGON_MODE_FILL,
-               VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST) {}
+               renderOptions.scissor, renderPass, pipelineLayout.pipelineLayout,
+               renderOptions.depth, renderOptions.blend, renderOptions.polyMode,
+               renderOptions.topology) {}
 
 PipelineTex::~PipelineTex() {}
 

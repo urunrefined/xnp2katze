@@ -11,7 +11,8 @@
 #include "vk/VKDescriptorPoolExt.h"
 #include "vk/VKDevice.h"
 #include "vk/VKPhysicalDevice.h"
-#include "vk/VKRenderer.h"
+#include "vk/VKPipelineTexExtIyColor.h"
+
 #include "vk/VKSampler.h"
 
 #include "util/Core.h"
@@ -49,23 +50,23 @@ class GLConsole {
     void addLine(const std::string &line);
     void addLine(const LineColor<80> &lineColor);
 
-    void draw(VulkanRenderer &renderer, VkCommandBuffer *commandBuffers,
+    void draw(PipelineTexExtIyColor &pipeline, VkCommandBuffer *commandBuffers,
               size_t bufferCount) {
 
-        renderer.pipelineExtIyColor16to9->record(
-            commandBuffers, bufferCount, sets.get(0), *commandLine.vtxs.gBuffer,
-            commandLine.vtxs.byteOffset, *commandLine.uvs.gBuffer,
-            commandLine.uvs.byteOffset, *commandLine.colors.gBuffer,
-            commandLine.colors.byteOffset, commandLine.drawCount);
+        pipeline.record(commandBuffers, bufferCount, sets.get(0),
+                        *commandLine.vtxs.gBuffer, commandLine.vtxs.byteOffset,
+                        *commandLine.uvs.gBuffer, commandLine.uvs.byteOffset,
+                        *commandLine.colors.gBuffer,
+                        commandLine.colors.byteOffset, commandLine.drawCount);
 
         for (size_t i = 0; i < visibleLines.size; i++) {
 
             GLTextColors &text = visibleLines[i];
-            renderer.pipelineExtIyColor16to9->record(
-                commandBuffers, bufferCount, sets.get(i + 1),
-                *text.vtxs.gBuffer, text.vtxs.byteOffset, *text.uvs.gBuffer,
-                text.uvs.byteOffset, *text.colors.gBuffer,
-                text.colors.byteOffset, text.drawCount);
+            pipeline.record(commandBuffers, bufferCount, sets.get(i + 1),
+                            *text.vtxs.gBuffer, text.vtxs.byteOffset,
+                            *text.uvs.gBuffer, text.uvs.byteOffset,
+                            *text.colors.gBuffer, text.colors.byteOffset,
+                            text.drawCount);
         }
     }
 

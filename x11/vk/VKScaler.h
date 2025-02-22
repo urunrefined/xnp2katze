@@ -8,7 +8,6 @@
 #include "VKPhysicalDevice.h"
 #include "VKRenderBuffer.h"
 #include "VKRenderPass.h"
-#include "VKRenderer.h"
 #include "VKShaders.h"
 #include "VKSync.h"
 #include "VKTexture.h"
@@ -82,6 +81,8 @@ class VulkanScaler {
                                VkSwapchainKHR swapchainImages
 
     );
+
+    ~VulkanScaler() { vkDeviceWaitIdle(device); }
 };
 
 } // namespace BR
