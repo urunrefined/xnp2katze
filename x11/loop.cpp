@@ -125,6 +125,10 @@ static void glLoop(SignalFD &sfd, InputMapper &inputMapper,
 void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
           Sfx::PulseSoundEngine &soundEngine) {
 
+    VisualScreen visualScreen = VisualScreen::MAIN;
+    DoubleLines doubleLines = DoubleLines::NO;
+    ViewPortMode mode = ViewPortMode::INTEGER;
+
     vkdebug = 1;
 
     GLFWContext glfwContext(640, 400);
@@ -206,7 +210,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     RenderOptions renderOptions = {
 
-        VK_TRUE, VK_TRUE, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        VK_FALSE, VK_FALSE, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
         VK_POLYGON_MODE_FILL,
         getIntegerScissor(pc98Width, pc98Height, swapChain->extent.width,
                           swapChain->extent.height)};
@@ -266,6 +270,9 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
             needsUpdate = true;
         }
 
+        inputMapper.handleInput(input, mode, visualScreen, doubleLines,
+                                soundEngine);
+
         input.reset();
 
         if (scaler->renderingComplete()) {
@@ -276,10 +283,6 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                 ctx.dirty = false;
 
                 memcpy(mainTexture.data, img.data(), img.size());
-
-                for (size_t i = 3; i < img.size(); i += 4) {
-                    ((char *)mainTexture.data)[i] = 255;
-                }
 
                 mainTexture.dirty();
                 needsUpdate = true;
@@ -309,9 +312,9 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
                          */
 
-                renderOptions.scissor = getIntegerScissor(pc98Width, pc98Height,
-                                  swapChain->extent.width,
-                                  swapChain->extent.height);
+                renderOptions.scissor = getIntegerScissor(
+                    pc98Width, pc98Height, swapChain->extent.width,
+                    swapChain->extent.height);
                 pipeline = std::make_unique<PipelineTex>(
                     device, shaderStore, renderOptions, *renderPass,
                     layouts.descriptorLayout);

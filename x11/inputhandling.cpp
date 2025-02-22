@@ -430,6 +430,7 @@ static KeyMappingNew keyTable[]{
 
 static void mapAndSendKey(KeyEvent &keyEvent,
                           const std::vector<KeyMappingNew> &newKeyTable) {
+
     for (const KeyMappingNew &mapping : newKeyTable) {
         if (mapping.key == keyEvent.key) {
             if (keyEvent.state == PRESSED) {
