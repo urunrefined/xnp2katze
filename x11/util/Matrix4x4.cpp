@@ -137,6 +137,13 @@ Matrix4x4f Matrix4x4f::ortho16To9() {
     return matrix;
 }
 
+Matrix4x4f Matrix4x4f::ortho(float aspect) {
+    Matrix4x4f matrix = ortho1To1();
+    matrix(0, 0) = matrix(0, 0) / (aspect);
+
+    return matrix;
+}
+
 const float *Matrix4x4f::getData() const { return data; }
 
 void Matrix4x4f::print() const {

@@ -26,7 +26,7 @@ GLConsole::GLConsole(DataAllocator &dataAllocator, FontContext &fontContext,
 
     float marginLeft = 10;
 
-    auto mat = Matrix4x4f::ortho16To9();
+    auto mat = Matrix4x4f::ortho(4.f / 3.f);
 
     float scale = ((visibleLines.size + 1) * 1);
     scale += ((visibleLines.size - 1) * lineSpacing);

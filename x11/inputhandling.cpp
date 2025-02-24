@@ -454,48 +454,43 @@ void InputMapper::handleInput(Input &input, ViewPortMode &viewPortMode,
                               DoubleLines &doubleLine,
                               Sfx::PulseSoundEngine &soundRef) {
 
-    if (input.getButton(KeyButtons::KEY_SUPER)) {
-        for (auto &keyEvent : input.keyEvents) {
-            if (keyEvent.key == KeyButtons::KEY_E &&
-                keyEvent.state == PRESSED) {
-                viewPortMode = next(viewPortMode);
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_H &&
-                keyEvent.state == PRESSED) {
-                doubleLine = next(doubleLine);
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_NUMPAD_DIV &&
-                keyEvent.state == PRESSED) {
-                soundRef.decreaseVol(0.05);
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_NUMPAD_MULT &&
-                keyEvent.state == PRESSED) {
-                soundRef.increaseVol(0.05);
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_M &&
-                keyEvent.state == PRESSED) {
-                soundRef.toggleMute();
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_I &&
-                keyEvent.state == PRESSED) {
-                pccore_reset(&soundRef);
-            }
-
-            if (keyEvent.key == KeyButtons::KEY_K &&
-                keyEvent.state == PRESSED) {
-                visualScreen = next(visualScreen);
-            }
+    for (auto &keyEvent : input.keyEvents) {
+        if (keyEvent.key == KeyButtons::KEY_E && keyEvent.state == PRESSED) {
+            viewPortMode = next(viewPortMode);
         }
-    } else {
-        for (auto &keyEvent : input.keyEvents) {
-            mapAndSendKey(keyEvent, mapping);
-            // kbdTest();
+
+        if (keyEvent.key == KeyButtons::KEY_H && keyEvent.state == PRESSED) {
+            doubleLine = next(doubleLine);
         }
+
+        if (keyEvent.key == KeyButtons::KEY_NUMPAD_DIV &&
+            keyEvent.state == PRESSED) {
+            soundRef.decreaseVol(0.05);
+        }
+
+        if (keyEvent.key == KeyButtons::KEY_NUMPAD_MULT &&
+            keyEvent.state == PRESSED) {
+            soundRef.increaseVol(0.05);
+        }
+
+        if (keyEvent.key == KeyButtons::KEY_M && keyEvent.state == PRESSED) {
+            soundRef.toggleMute();
+        }
+
+        if (keyEvent.key == KeyButtons::KEY_I && keyEvent.state == PRESSED) {
+            pccore_reset(&soundRef);
+        }
+
+        if (keyEvent.key == KeyButtons::KEY_K && keyEvent.state == PRESSED) {
+            visualScreen = next(visualScreen);
+        }
+    }
+}
+
+void InputMapper::handleInputKeys(Input &input) {
+
+    for (auto &keyEvent : input.keyEvents) {
+        mapAndSendKey(keyEvent, mapping);
     }
 }
 

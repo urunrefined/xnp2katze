@@ -21,6 +21,8 @@ class InputMapper {
     void handleInput(Input &input, ViewPortMode &viewPortMode,
                      VisualScreen &visualScreen, DoubleLines &doubleLines,
                      Sfx::PulseSoundEngine &soundRef);
+
+    void handleInputKeys(Input &input);
 };
 
 std::vector<KeyMappingNew> getDefaultKeyMap();

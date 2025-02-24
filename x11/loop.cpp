@@ -21,6 +21,8 @@
 
 #include "pulse/PulseSoundEngine.h"
 
+#include "util/Codepage.h"
+
 #include "exception.h"
 #include "inputhandling.h"
 #include "loop.h"
@@ -43,84 +45,21 @@ static const char *validationLayerString = "VK_LAYER_KHRONOS_validation";
 static const unsigned int pc98Width = 640;
 static const unsigned int pc98Height = 400;
 
-/*
-
-static void glLoop(SignalFD &sfd, InputMapper &inputMapper,
-                   VulkanContext &engine, VulkanPhysicalDevice &physicalDevice,
-                   Sfx::PulseSoundEngine &soundEngine, NP2CFG &cfg,
-                   NP2OSCFG &oscfg) {
-    VisualScreen visualScreen = VisualScreen::MAIN;
-    DoubleLines doubleLines = DoubleLines::NO;
-
-    VulkanScaler scaler(engine, physicalDevice);
-    std::unique_ptr<VulkanRenderBuffer> renderBuffer;
-
-    VulkanTexture mainTexture(
-        scaler.device, physicalDevice, scaler.renderer.graphicsQueue,
-        scaler.renderer.graphicsFamily, pc98Width, pc98Height);
-
-    VulkanDescriptorPool descriptorPool(scaler.device, 1);
-
-    VulkanDescriptorSet descriptorSetMain(
-        scaler.device, mainTexture.textureView, scaler.renderer.sampler,
-        descriptorPool, scaler.renderer.descriptorLayout);
-
-    CallbackContext ctx{&mainTexture, &scaler.context.glfwCtx.input};
-
-    ViewPortMode mode = ViewPortMode::INTEGER;
-
-    std::vector<VulkanCmbBuffer *> cmbBuffers;
-
-    while (scaler.getWindowState() != WindowState::SHOULDCLOSE &&
-           !sfd.isTriggered()) {
-        mainloop(&ctx, &soundEngine);
-
-        if (scaler.renderingComplete()) {
-
-            mainTexture.update(doubleLines);
-
-            renderBuffer = scaler.newRenderBuffer();
-            scaler.pollWindowEvents();
-
-            renderBuffer->begin(scaler.getRenderPass(), scaler.swapchain);
-
-            if (visualScreen == VisualScreen::CFG) {
-
-            } else {
-                if (mode == ViewPortMode::ASPECT) {
-                    scaler.renderer.pipelineAspect->record(
-                        *renderBuffer, descriptorSetMain, 6);
-                } else if (mode == ViewPortMode::STRETCH) {
-                    scaler.renderer.pipelineStretch->record(
-                        *renderBuffer, descriptorSetMain, 6);
-                } else {
-                    scaler.renderer.pipelineInteger->record(
-                        *renderBuffer, descriptorSetMain, 6);
-                }
-            }
-
-            renderBuffer->end();
-
-            if (scaler.drawAndPresent(*renderBuffer, cmbBuffers) ==
-                RenderState::NEEDSSWAPCHAINUPDATE) {
-                scaler.recreateSwapChain();
-            }
-        }
-
-        GLFWInput &input = engine.glfwCtx.getInput();
-
-        inputMapper.handleInput(input, mode, visualScreen, doubleLines,
-                                soundEngine);
-
-        input.reset();
+static void listConfig(GLConsole &console, NP2OSCFG &oscfg) {
+    LineColor<80> lineColor;
+    {
+        lineColor << FormatString{"Display Clock:", 0} << FormatPad{24, 0}
+                  << FormatSize{oscfg.DISPCLK, 2};
+        console.addLine(lineColor);
     }
+}
 
-    while (!scaler.renderingComplete()) {
-        usleep(1000);
+static void processConsoleCommand(const std::string &command,
+                                  GLConsole &console, NP2OSCFG &oscfg) {
+    if (command == "showosconfig") {
+        listConfig(console, oscfg);
     }
-
-    vkDeviceWaitIdle(scaler.device);
-}*/
+}
 
 void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
           Sfx::PulseSoundEngine &soundEngine) {
@@ -172,7 +111,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     std::string fontfile = getFont();
     printf("using font %s\n", fontfile.c_str());
-    Font font(fontfile.c_str(), 128);
+    Font font(fontfile.c_str(), 64);
 
     FontContext fontContext{glyphCache.textGlyphMappingCache,
                             glyphCache.imageIndexed, font.freetypeFace,
@@ -209,15 +148,25 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                                                       renderDepthFormat));
 
     RenderOptions renderOptions = {
-
         VK_FALSE, VK_FALSE, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
         VK_POLYGON_MODE_FILL,
         getIntegerScissor(pc98Width, pc98Height, swapChain->extent.width,
                           swapChain->extent.height)};
 
+    RenderOptions renderOptionsBlend = {
+        VK_FALSE, VK_TRUE, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        VK_POLYGON_MODE_FILL,
+        getAspectScissor(4.0f / 3.0f, swapChain->extent.width,
+                         swapChain->extent.height)};
+
     std::unique_ptr<PipelineTex> pipeline =
         std::make_unique<PipelineTex>(device, shaderStore, renderOptions,
                                       *renderPass, layouts.descriptorLayout);
+
+    std::unique_ptr<PipelineTexExtIyColor> pipelineConsole =
+        std::make_unique<PipelineTexExtIyColor>(device, shaderStore,
+                                                renderOptionsBlend, *renderPass,
+                                                layouts.descriptorLayoutExt);
 
     std::unique_ptr<VulkanScaler> scaler =
         std::make_unique<VulkanScaler>(device);
@@ -265,15 +214,78 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
         GLFWInput &input = glfwContext.input;
 
-        if (!input.codepoints.empty()) {
-            console.add(input.codepoints);
-            needsUpdate = true;
+        if (input.getButton(KeyButtons::KEY_SUPER)) {
+            inputMapper.handleInput(input, mode, visualScreen, doubleLines,
+                                    soundEngine);
+        } else {
+
+            if (visualScreen == VisualScreen::CONSOLE) {
+                if (!input.codepoints.empty()) {
+                    console.add(input.codepoints);
+                    needsUpdate = true;
+                }
+
+                for (auto &keyEvent : input.keyEvents) {
+                    if (keyEvent.key == KeyButtons::KEY_ENTER &&
+                        keyEvent.state == PRESSED) {
+                        auto utf8 = getUTF8FromUnicode(console.codePoints);
+
+                        if (utf8) {
+                            processConsoleCommand(*utf8, console, oscfg);
+                        }
+
+                        console.clear();
+                        console.ready();
+
+                        needsUpdate = true;
+                    }
+
+                    if (keyEvent.key == KeyButtons::KEY_BACKSPACE &&
+                        keyEvent.state == PRESSED) {
+                        console.del();
+                        needsUpdate = true;
+                    }
+
+                    if (keyEvent.key == KeyButtons::KEY_ARROW_UP &&
+                        keyEvent.state == PRESSED) {
+                        console.up();
+                        console.ready();
+                        needsUpdate = true;
+                    }
+
+                    if (keyEvent.key == KeyButtons::KEY_ARROW_DOWN &&
+                        keyEvent.state == PRESSED) {
+                        console.down();
+                        console.ready();
+                        needsUpdate = true;
+                    }
+
+                    if (keyEvent.key == KeyButtons::KEY_PAGE_UP &&
+                        keyEvent.state == PRESSED) {
+                        console.pageUp();
+                        console.ready();
+                        needsUpdate = true;
+                    }
+
+                    if (keyEvent.key == KeyButtons::KEY_PAGE_DOWN &&
+                        keyEvent.state == PRESSED) {
+                        console.pageDown();
+                        console.ready();
+                        needsUpdate = true;
+                    }
+                }
+
+            } else {
+                inputMapper.handleInputKeys(input);
+            }
         }
 
-        inputMapper.handleInput(input, mode, visualScreen, doubleLines,
-                                soundEngine);
-
         input.reset();
+
+        if (glyphCache.imageIndexed.dirty) {
+            glyphCache.alphaTexture.dirty();
+            glyphCache.imageIndexed.dirty = false;
+        }
 
         if (scaler->renderingComplete()) {
             bool hasData = false;
@@ -308,16 +320,21 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                         device, physicalDevice, *swapChain, *renderPass,
                         renderDepthFormat);
 
-                /*
-
-                         */
-
                 renderOptions.scissor = getIntegerScissor(
                     pc98Width, pc98Height, swapChain->extent.width,
                     swapChain->extent.height);
+
+                renderOptionsBlend.scissor =
+                    getAspectScissor(4.0f / 3.0f, swapChain->extent.width,
+                                     swapChain->extent.height);
+
                 pipeline = std::make_unique<PipelineTex>(
                     device, shaderStore, renderOptions, *renderPass,
                     layouts.descriptorLayout);
+
+                pipelineConsole = std::make_unique<PipelineTexExtIyColor>(
+                    device, shaderStore, renderOptionsBlend, *renderPass,
+                    layouts.descriptorLayoutExt);
 
                 scaler = std::make_unique<VulkanScaler>(device);
 
@@ -337,10 +354,11 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                                  renderBuffer->commandBuffers.size(),
                                  descriptorSetMain, 6);
 
-                /*
-                console.draw(*renderer, renderBuffer->commandBuffers.data(),
-                             renderBuffer->commandBuffers.size());
-                */
+                if (visualScreen == VisualScreen::CONSOLE) {
+                    console.draw(*pipelineConsole,
+                                 renderBuffer->commandBuffers.data(),
+                                 renderBuffer->commandBuffers.size());
+                }
 
                 renderBuffer->end();
 

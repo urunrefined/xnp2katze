@@ -50,6 +50,7 @@ class Matrix4x4f {
 
     static Matrix4x4f ortho1To1();
     static Matrix4x4f ortho16To9();
+    static Matrix4x4f ortho(float aspect);
 
     const float *getData() const;
 
