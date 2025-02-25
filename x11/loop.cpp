@@ -45,13 +45,82 @@ static const char *validationLayerString = "VK_LAYER_KHRONOS_validation";
 static const unsigned int pc98Width = 640;
 static const unsigned int pc98Height = 400;
 
-static void listConfig(GLConsole &console, NP2OSCFG &oscfg) {
+static void list(GLConsole &console, const char *str, UINT32 val,
+                 UINT32 offset = 0) {
     LineColor<80> lineColor;
-    {
-        lineColor << FormatString{"Display Clock:", 0} << FormatPad{24, 0}
-                  << FormatSize{oscfg.DISPCLK, 2};
-        console.addLine(lineColor);
-    }
+
+    lineColor << FormatString{str, 0} << FormatPad{24 + offset, 0}
+              << FormatSize{val, 2};
+
+    console.addLine(lineColor);
+}
+
+static void listSep(GLConsole &console, const char *sentinel, const char *str,
+                    UINT32 offset = 0) {
+    LineColor<80> lineColor;
+
+    lineColor << FormatString{sentinel, 0} << FormatString{str, 1}
+              << FormatString{sentinel, 0};
+
+    console.addLine(lineColor);
+}
+
+static void list(GLConsole &console, const char *str, const char *val,
+                 UINT32 offset = 0) {
+    LineColor<80> lineColor;
+    lineColor << FormatString{str, 0} << FormatPad{24 + offset, 0}
+              << FormatString{val, 2};
+
+    console.addLine(lineColor);
+}
+
+static void listComConfig(GLConsole &console, COMCFG &cfg) {
+    list(console, "type", cfg.type, 4);
+    list(console, "ttyname", cfg.ttyname, 4);
+    list(console, "alsaRawHWName", cfg.alsaRawHWName, 4);
+}
+
+static void listConfig(GLConsole &console, NP2OSCFG &oscfg) {
+    list(console, "Display Clock", oscfg.DISPCLK);
+
+    listSep(console, " --- ", "Joypads");
+
+    list(console, "JoyPad 1", oscfg.JOYPAD1);
+    list(console, "JoyPad 2", oscfg.JOYPAD2);
+
+    list(console, "Joy Device 1", oscfg.JOYDEV[0]);
+    list(console, "Joy Device 2", oscfg.JOYDEV[1]);
+    list(console, "", "");
+
+    listSep(console, " --- ", "mpu");
+    listComConfig(console, oscfg.mpu);
+    list(console, "", "");
+
+    listSep(console, " --- ", "com 0");
+    listComConfig(console, oscfg.com[0]);
+    list(console, "", "");
+
+    listSep(console, " --- ", "com 1");
+    listComConfig(console, oscfg.com[1]);
+    list(console, "", "");
+
+    listSep(console, " --- ", "com 2");
+    listComConfig(console, oscfg.com[2]);
+    list(console, "", "");
+
+    list(console, "Confirm", oscfg.confirm);
+    list(console, "StatSave", oscfg.statsave);
+    list(console, "hostdrv_write", oscfg.hostdrv_write);
+    list(console, "jastsnd", oscfg.jastsnd);
+    list(console, "", "");
+
+    listSep(console, " --- ", "midi");
+
+    list(console, "Midiwait", oscfg.MIDIWAIT);
+    list(console, "Mididev 0", oscfg.MIDIDEV[0]);
+    list(console, "Mididev 1", oscfg.MIDIDEV[1]);
+
+    list(console, "", "");
 }
 
 static void processConsoleCommand(const std::string &command,
