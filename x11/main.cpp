@@ -335,7 +335,7 @@ static void go(int argc, char *argv[]) {
         }
     }
 
-    BR::loop(sfd, inputMapper, np2cfg, np2oscfg, pulseEngine);
+    BR::loop(sfd, inputMapper, np2cfg, np2oscfg, pulseEngine, diskDir);
 
     printf("Normal exit\n");
 

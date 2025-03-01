@@ -32,6 +32,16 @@ struct FormatSize {
     uint8_t color;
 };
 
+struct FormatHex {
+    uint8_t i;
+    uint8_t color;
+};
+
+struct FormatHex16 {
+    uint16_t i;
+    uint8_t color;
+};
+
 template <size_t N> struct LineColor {
     char text[N]{};
     uint8_t colors[N]{};
@@ -93,6 +103,22 @@ template <size_t N> struct LineColor {
         snprintf(buf, sizeof(buf), "%zu", formatSize.i);
 
         return (*this) << FormatString{buf, formatSize.color};
+    }
+
+    LineColor &operator<<(const FormatHex &formatHex) {
+        char buf[128];
+
+        snprintf(buf, sizeof(buf), "%.2hhx", formatHex.i);
+
+        return (*this) << FormatString{buf, formatHex.color};
+    }
+
+    LineColor &operator<<(const FormatHex16 &formatHex) {
+        char buf[128];
+
+        snprintf(buf, sizeof(buf), "%.4hx", formatHex.i);
+
+        return (*this) << FormatString{buf, formatHex.color};
     }
 
     void print() {

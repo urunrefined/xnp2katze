@@ -276,6 +276,7 @@ SRC_CPP = \
 		x11/util/SignalFD.cpp                          \
 		x11/util/LogBuffer.cpp                         \
 		x11/util/Codepage.cpp                          \
+		x11/util/StringView.cpp                        \
 		x11/font/Fontconfig.cpp                        \
 		x11/font/FreeFont.cpp                          \
 		x11/font/Harfbuzz.cpp                          \
