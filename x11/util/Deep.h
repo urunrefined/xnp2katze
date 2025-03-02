@@ -7,6 +7,13 @@
 
 namespace BR {
 
+void doubleBlankLinesAdaptive(uint16_t width, uint16_t height,
+                              const unsigned char *in, unsigned char *out,
+                              uint16_t cutOff = 120);
+
+void doubleBlankLines(uint16_t width, uint16_t height, const unsigned char *in,
+                      unsigned char *out);
+
 void fill(const ImageBGRA &image);
 void fill(const ImageBGRA &image, const ColorU8BGRA &color);
 void fill(const ImageBGRA &image, const Rect &rect, const ColorU8BGRA &color);

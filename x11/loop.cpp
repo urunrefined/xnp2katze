@@ -463,7 +463,17 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
                 ctx.dirty = false;
 
-                memcpy(mainTexture.data, img.data(), img.size());
+                if (doubleLines == DoubleLines::SIMPLE) {
+                    doubleBlankLines(pc98Width, pc98Height,
+                                     (const unsigned char *)img.data(),
+                                     (unsigned char *)mainTexture.data);
+                } else if (doubleLines == DoubleLines::ADAPTIVE) {
+                    doubleBlankLinesAdaptive(pc98Width, pc98Height,
+                                             (const unsigned char *)img.data(),
+                                             (unsigned char *)mainTexture.data);
+                } else {
+                    memcpy(mainTexture.data, img.data(), img.size());
+                }
 
                 mainTexture.dirty();
                 needsUpdate = true;

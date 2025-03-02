@@ -7,6 +7,105 @@
 
 namespace BR {
 
+static bool lineHasData(const unsigned char *data, unsigned int width) {
+    for (unsigned int x = 0; x < width * 4; x++) {
+        if (data[x])
+            return true;
+    }
+
+    return false;
+}
+
+struct LineSegment {
+    uint16_t start;
+    uint16_t size;
+};
+
+static std::vector<LineSegment>
+getLineSegments(const unsigned char *data, uint16_t width, uint16_t pxCutOff) {
+    uint16_t start = 0;
+    uint16_t sz = 0;
+
+    std::vector<LineSegment> blankSegments;
+
+    for (uint16_t w = 0; w < width; w++) {
+        if (sz == 0) {
+            start = w;
+        }
+
+        if (data[w * 4 + 0] || data[w * 4 + 1] || data[w * 4 + 2] ||
+            data[w * 4 + 3]) {
+            if (sz >= pxCutOff) {
+                blankSegments.push_back({start, sz});
+            }
+
+            sz = 0;
+        } else {
+            sz++;
+        }
+    }
+
+    if (sz >= pxCutOff) {
+        blankSegments.push_back({start, sz});
+    }
+
+    return blankSegments;
+}
+
+static uint16_t addAll(const std::vector<LineSegment> &segments) {
+    uint16_t ret = 0;
+
+    for (auto &segment : segments) {
+        ret += segment.size;
+    }
+
+    return ret;
+}
+
+void doubleBlankLinesAdaptive(uint16_t width, uint16_t height,
+                              const unsigned char *in, unsigned char *out,
+                              uint16_t cutOff) {
+    memcpy(out, in, width * 4);
+
+    for (uint16_t h = 1; h < height - 1; h++) {
+        if (lineHasData(in + (h + 1) * width * 4, width)) {
+            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
+            auto lineSegments = getLineSegments(in + (h)*width * 4, width, 30);
+
+            if (addAll(lineSegments) > cutOff) {
+                for (auto &lineSegment : lineSegments) {
+
+                    memcpy(out + (h)*width * 4 + (lineSegment.start * 4),
+                           in + (h - 1) * width * 4 + (lineSegment.start * 4),
+                           lineSegment.size * 4);
+                }
+            }
+        } else {
+            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
+        }
+    }
+
+    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
+           width * 4);
+}
+
+void doubleBlankLines(uint16_t width, uint16_t height, const unsigned char *in,
+                      unsigned char *out) {
+    memcpy(out, in, width * 4);
+
+    for (uint16_t h = 1; h < height - 1; h++) {
+        if (!lineHasData(in + h * width * 4, width) &&
+            lineHasData(in + (h + 1) * width * 4, width)) {
+            memcpy(out + (h)*width * 4, in + (h - 1) * width * 4, width * 4);
+        } else {
+            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
+        }
+    }
+
+    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
+           width * 4);
+}
+
 void fill(const ImageBGRA &image, const ColorU8BGRA &color) {
     auto data = image.data;
 
