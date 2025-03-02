@@ -69,8 +69,7 @@ static void listIdx(GLConsole &console, size_t idx, const char *str) {
     console.addLine(lineColor);
 }
 
-static void listSep(GLConsole &console, const char *sentinel, const char *str,
-                    UINT32 offset = 0) {
+static void listSep(GLConsole &console, const char *sentinel, const char *str) {
     LineColor<80> lineColor;
 
     lineColor << FormatString{sentinel, 0} << FormatString{str, 1}
@@ -110,8 +109,6 @@ static void printHex(GLConsole &console, size_t offset, size_t sz,
 }
 
 static void cHexdumpMainmem(GLConsole &console, size_t offset, size_t size) {
-    size_t written = 0;
-
     if (offset + size > 0x200000) {
         list(console, "Dump would go above address 0x200000", "");
         return;
@@ -232,6 +229,8 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
 void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
           Sfx::PulseSoundEngine &soundEngine, const std::string &diskDir) {
 
+    (void)cfg;
+
     VisualScreen visualScreen = VisualScreen::MAIN;
     DoubleLines doubleLines = DoubleLines::NO;
     ViewPortMode mode = ViewPortMode::INTEGER;
@@ -264,8 +263,6 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     VulkanDescriptorPoolExt descriptorPoolExt(device, 32);
     VulkanSampler sampler(physicalDevice, device, VK_FILTER_NEAREST);
-    size_t usSize = VulkanDescriptorSetExt::getChunkSize(physicalDevice, 32);
-
     VkFormat renderDepthFormat = findDepthFormat(physicalDevice);
 
     // TODO: UniformBuffer needs to be newly calculated
@@ -457,8 +454,6 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
         }
 
         if (scaler->renderingComplete()) {
-            bool hasData = false;
-
             if (ctx.dirty) {
 
                 ctx.dirty = false;
