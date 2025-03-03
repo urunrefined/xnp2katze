@@ -364,10 +364,6 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
         mainloop(&ctx, &soundEngine);
 
-        if (!needsSwapchainUpdate && !needsUpdate) {
-            // glfwContext.wait(1);
-        }
-
         auto nDims = glfwContext.getCurrentSize();
 
         glfwContext.pollWindowEvents();
@@ -380,8 +376,12 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
         GLFWInput &input = glfwContext.input;
 
         if (input.getButton(KeyButtons::KEY_SUPER)) {
-            inputMapper.handleInput(input, mode, visualScreen, doubleLines,
-                                    soundEngine);
+            if (inputMapper.handleInput(input, mode, visualScreen, doubleLines,
+                                        soundEngine)) {
+
+                needsUpdate = true;
+            };
+
         } else {
 
             if (visualScreen == VisualScreen::MAIN) {

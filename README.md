@@ -273,3 +273,5 @@ every one of the available settings via the commandline
 * Currently only one Vulkan command buffer is being used (there is only
 one texture image). This needs to be done properly
 * Add back an i286 option
+* Console colors dont work with multibyte chars, as the mapping between
+the characters and the stuff harfbuzz spits out is not obvious...

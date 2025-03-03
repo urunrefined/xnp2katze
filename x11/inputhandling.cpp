@@ -449,42 +449,53 @@ template <class T1> T1 next(const T1 &t1) {
     return (T1)((((int)t1) + 1) % (int)T1::END);
 }
 
-void InputMapper::handleInput(Input &input, ViewPortMode &viewPortMode,
+bool InputMapper::handleInput(Input &input, ViewPortMode &viewPortMode,
                               VisualScreen &visualScreen,
                               DoubleLines &doubleLine,
                               Sfx::PulseSoundEngine &soundRef) {
 
+    bool changed = false;
+
     for (auto &keyEvent : input.keyEvents) {
         if (keyEvent.key == KeyButtons::KEY_E && keyEvent.state == PRESSED) {
             viewPortMode = next(viewPortMode);
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_H && keyEvent.state == PRESSED) {
             doubleLine = next(doubleLine);
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_NUMPAD_DIV &&
             keyEvent.state == PRESSED) {
             soundRef.decreaseVol(0.05);
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_NUMPAD_MULT &&
             keyEvent.state == PRESSED) {
             soundRef.increaseVol(0.05);
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_M && keyEvent.state == PRESSED) {
             soundRef.toggleMute();
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_I && keyEvent.state == PRESSED) {
             pccore_reset(&soundRef);
+            changed = true;
         }
 
         if (keyEvent.key == KeyButtons::KEY_K && keyEvent.state == PRESSED) {
             visualScreen = next(visualScreen);
+            changed = true;
         }
     }
+
+    return changed;
 }
 
 void InputMapper::handleInputKeys(Input &input) {
