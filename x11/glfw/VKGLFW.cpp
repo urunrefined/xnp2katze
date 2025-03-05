@@ -26,6 +26,24 @@ static void onWindowResized(GLFWwindow *window, int width, int height) {
     onWindowResized(window, (unsigned int)width, (unsigned int)height);
 }
 
+static void focusedCallback(GLFWwindow *window, int focused) {
+    (void)focused;
+
+    printf("Focused\n");
+
+    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    ctx->forcePresent = true;
+}
+
+static void maximizeCallback(GLFWwindow *window, int maximized) {
+    (void)maximized;
+
+    printf("Maximized\n");
+
+    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    ctx->forcePresent = true;
+}
+
 struct KeyMapping {
     int glfwKey;
     KeyButtons inputKey;
@@ -280,6 +298,8 @@ GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
     : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
     glfwInit();
 
+    forcePresent = false;
+
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
     assert((int)surfaceHeight > 0);
@@ -300,6 +320,8 @@ GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCharCallback(window, charCallback);
+    glfwSetWindowMaximizeCallback(window, maximizeCallback);
+    glfwSetWindowFocusCallback(window, focusedCallback);
 
     onWindowResized(window, surfaceWidth, surfaceHeight);
 

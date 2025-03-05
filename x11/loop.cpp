@@ -375,6 +375,11 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
         GLFWInput &input = glfwContext.input;
 
+        if (glfwContext.forcePresent) {
+            glfwContext.forcePresent = false;
+            needsUpdate = true;
+        }
+
         if (input.getButton(KeyButtons::KEY_SUPER)) {
             if (inputMapper.handleInput(input, mode, visualScreen, doubleLines,
                                         soundEngine)) {

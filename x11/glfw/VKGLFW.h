@@ -48,6 +48,8 @@ class GLFWContext {
     uint32_t requestedWindowWidth;
     uint32_t requestedWindowHeight;
 
+    bool forcePresent;
+
     GLFWwindow *window;
 
     GLFWContext(uint32_t width_, uint32_t height_);
