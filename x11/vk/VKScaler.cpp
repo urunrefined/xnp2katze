@@ -88,8 +88,8 @@ static RenderState presentIfFinished(VulkanSemaphore &renderFinishedSemaphore,
 }
 
 void VulkanScaler::present(uint32_t imageIdx, VkSwapchainKHR swapchain) {
-    presentIfFinished(renderSemaphores.renderFinishedSemaphore, swapchain,
-                      imageIdx, device.presentQueue);
+    presentIfFinished(renderSemaphores.renderFinishedSemaphores[imageIdx],
+                      swapchain, imageIdx, device.presentQueue);
 
     imageSitter.block();
 }
@@ -161,7 +161,7 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
 
         drawSubmitInfo.signalSemaphoreCount = 1;
         drawSubmitInfo.pSignalSemaphores =
-            renderSemaphores.renderFinishedSemaphore;
+            renderSemaphores.renderFinishedSemaphores[imageIndex];
     }
 
     // Need to make sure that the command-buffers are never deleted
@@ -205,8 +205,8 @@ VulkanScaler::drawAndPresent(VulkanRenderBuffer &renderBuffer,
     if (idx.state != RenderState::OK)
         return idx.state;
 
-    presentIfFinished(renderSemaphores.renderFinishedSemaphore, swapchain,
-                      idx.index, device.presentQueue);
+    presentIfFinished(renderSemaphores.renderFinishedSemaphores[idx.index],
+                      swapchain, idx.index, device.presentQueue);
 
     imageSitter.block();
     return RenderState::OK;

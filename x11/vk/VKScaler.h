@@ -35,12 +35,18 @@ class RenderSemaphores {
 
   public:
     VulkanSemaphore imageAvailableSemaphore;
-    VulkanSemaphore renderFinishedSemaphore;
     VulkanSemaphore vboUpdatedSemaphore;
+    std::vector<VulkanSemaphore> renderFinishedSemaphores;
 
-    RenderSemaphores(VulkanDevice &device)
-        : imageAvailableSemaphore(device), renderFinishedSemaphore(device),
-          vboUpdatedSemaphore(device) {}
+    RenderSemaphores(VulkanDevice &device, size_t count)
+        : imageAvailableSemaphore(device), vboUpdatedSemaphore(device) {
+
+        renderFinishedSemaphores.reserve(count);
+
+        for (size_t i = 0; i < count; i++) {
+            renderFinishedSemaphores.emplace_back(device);
+        }
+    }
 };
 
 class VulkanScaler {
@@ -55,10 +61,10 @@ class VulkanScaler {
 
     RenderSemaphores renderSemaphores;
 
-    VulkanScaler(VulkanDevice &device)
+    VulkanScaler(VulkanDevice &device, size_t imageCount)
         : device(device), pool(device, device.graphicsFamily),
           commandBuffer(nullptr), imageSitter(device), queueSitter(device),
-          renderSemaphores(device) {}
+          renderSemaphores(device, imageCount) {}
 
     bool renderingComplete() {
         if (!queueSitter.done()) {

@@ -334,7 +334,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                                                 layouts.descriptorLayoutExt);
 
     std::unique_ptr<VulkanScaler> scaler =
-        std::make_unique<VulkanScaler>(device);
+        std::make_unique<VulkanScaler>(device, swapChainFramebuffers->images.size());
 
     std::unique_ptr<VulkanRenderBuffer> renderBuffer;
 
@@ -515,7 +515,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
                     device, shaderStore, renderOptionsBlend, *renderPass,
                     layouts.descriptorLayoutExt);
 
-                scaler = std::make_unique<VulkanScaler>(device);
+                scaler = std::make_unique<VulkanScaler>(device, swapChainFramebuffers->images.size());
 
                 needsSwapchainUpdate = false;
                 needsUpdate = true;
