@@ -13,7 +13,7 @@ static bool isFocused = false;
 
 static void onWindowResized(GLFWwindow *window, unsigned int width,
                             unsigned int height) {
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
 
     if (height == 0)
         height = 1;
@@ -24,24 +24,6 @@ static void onWindowResized(GLFWwindow *window, unsigned int width,
 
 static void onWindowResized(GLFWwindow *window, int width, int height) {
     onWindowResized(window, (unsigned int)width, (unsigned int)height);
-}
-
-static void focusedCallback(GLFWwindow *window, int focused) {
-    (void)focused;
-
-    printf("Focused\n");
-
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
-    ctx->forcePresent = true;
-}
-
-static void maximizeCallback(GLFWwindow *window, int maximized) {
-    (void)maximized;
-
-    printf("Maximized\n");
-
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
-    ctx->forcePresent = true;
 }
 
 struct KeyMapping {
@@ -173,7 +155,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
     if (!isFocused)
         return;
 
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     GLFWInput &input = ctx->getInput();
 
     if (action == GLFW_PRESS) {
@@ -229,7 +211,7 @@ static void mouse_move_callback(GLFWwindow *window, double x, double y) {
     if (!isFocused)
         return;
 
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
     input.moveMouse(x, y);
@@ -243,7 +225,7 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action,
                                   int mods) {
     (void)mods;
 
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
     if (isFocused) {
@@ -276,7 +258,7 @@ static void scroll_callback(GLFWwindow *window, double xoffset,
     (void)window;
     (void)xoffset;
 
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
     if ((float)yoffset > 0.0f) {
@@ -287,20 +269,22 @@ static void scroll_callback(GLFWwindow *window, double xoffset,
 }
 
 static void charCallback(GLFWwindow *window, unsigned int codepoint) {
-    GLFWContext *ctx = (GLFWContext *)glfwGetWindowUserPointer(window);
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     GLFWInput &input = ctx->input;
 
     // add utf8
     input.codepoints.push_back((uint32_t)codepoint);
 }
 
-GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
-    : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
+GLFWContext::GLFWContext() {
     glfwInit();
-
-    forcePresent = false;
-
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+}
+
+GLFWContext::~GLFWContext() { glfwTerminate(); }
+
+GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight)
+    : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
 
     assert((int)surfaceHeight > 0);
     assert((int)surfaceWidth > 0);
@@ -320,20 +304,15 @@ GLFWContext::GLFWContext(uint32_t surfaceWidth, uint32_t surfaceHeight)
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCharCallback(window, charCallback);
-    glfwSetWindowMaximizeCallback(window, maximizeCallback);
-    glfwSetWindowFocusCallback(window, focusedCallback);
 
     onWindowResized(window, surfaceWidth, surfaceHeight);
 
     input.window = window;
 }
 
-GLFWContext::~GLFWContext() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-}
+GLFWSurface::~GLFWSurface() { glfwDestroyWindow(window); }
 
-Dimensions2D GLFWContext::getCurrentSize() {
+Dimensions2D GLFWSurface::getCurrentSize() {
     return {currentWidth, currentHeight};
 }
 
@@ -341,7 +320,7 @@ void GLFWContext::wait(double timeout) { glfwWaitEventsTimeout(timeout); }
 
 void GLFWContext::wait() { glfwWaitEvents(); }
 
-GLFWInput &GLFWContext::getInput() { return input; }
+GLFWInput &GLFWSurface::getInput() { return input; }
 
 std::vector<const char *> getRequiredGLFWExtensions() {
     std::vector<const char *> extensions;

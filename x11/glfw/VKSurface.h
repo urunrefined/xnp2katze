@@ -9,7 +9,7 @@ class VulkanSurface {
     VkInstance &instance;
     VkSurfaceKHR surface;
 
-    VulkanSurface(GLFWContext &context, VkInstance &instance_);
+    VulkanSurface(GLFWSurface &glfwSurface, VkInstance &instance_);
     ~VulkanSurface();
 
     operator VkSurfaceKHR &() { return surface; }

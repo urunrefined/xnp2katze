@@ -2,7 +2,12 @@
 
 #include <vulkan/vulkan.h>
 
+#include <vector>
+
 namespace BR {
+
+VkSurfaceFormatKHR chooseSwapSurfaceFormat(
+    const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
 class VulkanSwapChain {
     VkDevice device;

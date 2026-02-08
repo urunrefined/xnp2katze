@@ -11,7 +11,7 @@
 
 namespace BR {
 
-static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
+VkSurfaceFormatKHR chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
     if (availableFormats.size() == 1 &&
         availableFormats[0].format == VK_FORMAT_UNDEFINED) {

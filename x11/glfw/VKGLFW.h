@@ -36,6 +36,17 @@ enum class WindowState { SHOULDCLOSE = 0, MINIMIZED, FOCUSED };
 
 class GLFWContext {
   public:
+    GLFWContext();
+    ~GLFWContext();
+
+    void pollWindowEvents() { glfwPollEvents(); }
+
+    void wait(double timeout);
+    void wait();
+};
+
+class GLFWSurface {
+  public:
     uint32_t currentWidth;
     uint32_t currentHeight;
 
@@ -48,23 +59,16 @@ class GLFWContext {
     uint32_t requestedWindowWidth;
     uint32_t requestedWindowHeight;
 
-    bool forcePresent;
-
     GLFWwindow *window;
 
-    GLFWContext(uint32_t width_, uint32_t height_);
-    ~GLFWContext();
+    GLFWSurface(uint32_t width_, uint32_t height_);
+    ~GLFWSurface();
 
     GLFWInput input;
 
     Dimensions2D getCurrentSize();
 
     GLFWInput &getInput();
-
-    void wait(double timeout);
-    void wait();
-
-    void pollWindowEvents() { glfwPollEvents(); }
 
     WindowState getWindowState() {
         if (glfwWindowShouldClose(window)) {
