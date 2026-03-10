@@ -1,8 +1,11 @@
 
 #include "Fontconfig.h"
 
-#include <algorithm>
+#include <cstdio>
+#include <fontconfig.h>
 #include <string.h>
+#include <string>
+#include <vector>
 
 namespace BR {
 
@@ -65,7 +68,7 @@ class FontconfigPattern {
 };
 
 FontList::FontList(FontconfigLib &fontconfigLib) {
-    FontconfigPattern pat(fontconfigLib.config);
+    const FontconfigPattern pat(fontconfigLib.config);
 
     fs = FcFontSetCreate();
 
@@ -73,15 +76,15 @@ FontList::FontList(FontconfigLib &fontconfigLib) {
         throw "Obtaining fontlist failed";
     }
 
-    FontPattern fontPatterns(fontconfigLib.config, pat.pat, fs);
+    const FontPattern fontPatterns(fontconfigLib.config, pat.pat, fs);
 }
 
 void FontList::print() {
     printf("Total fonts: %d\n", fs->nfont);
     for (int i = 0; i < fs->nfont; i++) {
-        FcPattern *font = fs->fonts[i];
+        const FcPattern *font = fs->fonts[i];
 
-        FcChar8 *file = 0;
+        FcChar8 *file;
         FcPatternGetString(font, FC_FILE, 0, &file);
 
         printf("Font %d: [%s]\n", i, file);
@@ -95,7 +98,7 @@ FontList::getFontList(const std::vector<const char *> &requestedLangs) {
     print();
 
     for (int i = 0; i < fs->nfont; i++) {
-        FcPattern *font = fs->fonts[i];
+        const FcPattern *font = fs->fonts[i];
 
         FcChar8 *style;
         FcPatternGetString(font, FC_STYLE, 0, &style);
@@ -116,7 +119,7 @@ FontList::getFontList(const std::vector<const char *> &requestedLangs) {
         if (!outline)
             continue;
 
-        FcLangSet *langSet = 0;
+        FcLangSet *langSet;
         FcPatternGetLangSet(font, FC_LANG, 0, &langSet);
 
         bool langUnavailable = false;
@@ -132,10 +135,10 @@ FontList::getFontList(const std::vector<const char *> &requestedLangs) {
         if (langUnavailable)
             continue;
 
-        FcChar8 *file = 0;
+        FcChar8 *file;
         FcPatternGetString(font, FC_FILE, 0, &file);
 
-        FcChar8 *format = 0;
+        FcChar8 *format;
         FcPatternGetString(font, FC_FONTFORMAT, 0, &format);
 
         if (file) {

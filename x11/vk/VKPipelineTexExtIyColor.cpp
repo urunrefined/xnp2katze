@@ -1,6 +1,11 @@
 #include "VKPipelineTexExtIyColor.h"
 #include "util/Core.h"
 #include "util/Vertex.h"
+#include "vk/VKRenderOptions.h"
+#include "vk/VKShaders.h"
+#include <cstddef>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -74,7 +79,7 @@ void PipelineTexExtIyColor::record(VkCommandBuffer *commandBuffers,
 
     for (size_t i = 0; i < bufferCount; i++) {
 
-        VkBuffer buffers[3] = {vertices, uvs, colors};
+        const VkBuffer buffers[3] = {vertices, uvs, colors};
         VkDeviceSize bufferSizes[3] = {verticesOffset, uvOffset, colorOffset};
 
         vkCmdBindVertexBuffers(commandBuffers[i], 0, arraySize(buffers),

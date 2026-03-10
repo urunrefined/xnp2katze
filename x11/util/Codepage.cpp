@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <vector>
 
 #include <optional>
@@ -16,7 +15,7 @@ static bool validContByte(unsigned char ch) {
     return true;
 }
 
-int nextUTF8(const unsigned char *chstr) {
+static int nextUTF8(const unsigned char *chstr) {
     if (chstr[0] == '\0')
         return 0;
 
@@ -55,11 +54,13 @@ int nextUTF8(const unsigned char *chstr) {
     return -1;
 }
 
-std::optional<std::vector<uint32_t>> getUnicodeFromUTF8(const char *utf8) {
+std::optional<std::vector<uint32_t>> getUnicodeFromUTF8(const char *utf8_) {
     std::vector<uint32_t> codePoints;
 
+    const unsigned char *utf8 = (const unsigned char *)utf8_;
+
     while (true) {
-        int ret = nextUTF8((const unsigned char *)utf8);
+        const int ret = nextUTF8(utf8);
 
         if (ret == 0)
             break;
@@ -110,7 +111,7 @@ getUTF8FromUnicode(const std::vector<uint32_t> &codePoints) {
 
             str.append((const char *)utf8, 2);
         } else if (e < 0x10000) {
-            char utf8[3];
+            unsigned char utf8[3];
 
             utf8[0] = 0b1110'0000 | ((e & 0b1111'0000'0000'0000) >> 12);
             utf8[1] = 0b1000'0000 | ((e & 0b0000'1111'1100'0000) >> 6);
@@ -119,7 +120,7 @@ getUTF8FromUnicode(const std::vector<uint32_t> &codePoints) {
             str.append((const char *)utf8, 3);
 
         } else if (e <= 0x10FFFF) {
-            char utf8[4];
+            unsigned char utf8[4];
 
             utf8[0] =
                 0b1111'0000 | ((e & 0b0001'1100'0000'0000'0000'0000) >> 18);

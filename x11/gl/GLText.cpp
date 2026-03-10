@@ -1,7 +1,17 @@
+#include <cstddef>
 #include <stdint.h>
 
 #include "GLText.h"
+#include "font/FreeFont.h"
+#include "font/Freetype.h"
+#include "font/Harfbuzz.h"
+#include "gl/GLAlloc.h"
+#include "util/Array.h"
+#include "util/Vertex.h"
+#include "vk/VKDevice.h"
+#include "vk/VKPhysicalDevice.h"
 #include <algorithm>
+#include <vector>
 
 namespace BR {
 
@@ -34,10 +44,10 @@ GLTextColors::GLTextColors(DataAllocator &dataAllocator, HarfbuzzText &text,
                            std::vector<Mapping> &textGlyphMappingCache,
                            ImageIndexed8 &imageIndexed,
                            FreetypeFace &freetypeFace)
-    : vtxs(dataAllocator.get2fSegment(text.getGlyphCount() * 6)),
-      uvs(dataAllocator.get2fSegment(text.getGlyphCount() * 6)),
-      colors(dataAllocator.get3fSegment(text.getGlyphCount() * 6)),
-      drawCount(text.getGlyphCount() * 6), maxDrawCount(drawCount) {
+    : vtxs(dataAllocator.get2fSegment((size_t)text.getGlyphCount() * 6)),
+      uvs(dataAllocator.get2fSegment((size_t)text.getGlyphCount() * 6)),
+      colors(dataAllocator.get3fSegment((size_t)text.getGlyphCount() * 6)),
+      drawCount((size_t)text.getGlyphCount() * 6), maxDrawCount(drawCount) {
 
     setText(text, textGlyphMappingCache, imageIndexed, freetypeFace);
     setColor({1, 1, 1});
@@ -89,7 +99,7 @@ void GLTextColors::setColor(const Vec3 &color) {
 }
 
 void GLTextColors::setColor(const Vec3 &colorA, const Vec3 &colorB) {
-    int32_t letterCount = drawCount / 6;
+    const uint32_t letterCount = drawCount / 6;
 
     // printf("DrawCount %d\n", drawCount);
 
@@ -97,7 +107,7 @@ void GLTextColors::setColor(const Vec3 &colorA, const Vec3 &colorB) {
         return;
 
     std::vector<Vec3> duc;
-    duc.reserve(letterCount * 6);
+    duc.reserve((size_t)letterCount * 6);
 
     if (letterCount == 1) {
         duc.push_back(colorA);
@@ -108,10 +118,10 @@ void GLTextColors::setColor(const Vec3 &colorA, const Vec3 &colorB) {
         duc.push_back(colorA);
     } else {
 
-        Vec3 step = (colorB - colorA) / (letterCount - 1);
+        const Vec3 step = (colorB - colorA) / (float)(letterCount - 1);
         Vec3 start = colorA;
 
-        for (int32_t i = 0; i < letterCount; i++) {
+        for (uint32_t i = 0; i < letterCount; i++) {
             duc.push_back(start);
             duc.push_back(start);
             duc.push_back(start);

@@ -26,7 +26,7 @@ class VulkanBufferGeneric {
 };
 
 class VulkanCmbBuffer {
-    const VkDevice device;
+    VkDevice device;
 
   public:
     VulkanBufferGeneric bufferCard;

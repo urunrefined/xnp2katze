@@ -1,6 +1,19 @@
+#include <cstddef>
 #include <stdint.h>
+#include <string>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 #include "GLConsole.h"
+#include "font/FontContext.h"
+#include "font/Harfbuzz.h"
+#include "gl/GLAlloc.h"
+#include "util/Core.h"
+#include "util/LineColor.h"
+#include "util/Matrix4x4.h"
+#include "vk/VKDescriptorLayouts.h"
+#include "vk/VKPhysicalDevice.h"
+#include "vk/VKSampler.h"
 
 namespace BR {
 
@@ -20,16 +33,16 @@ GLConsole::GLConsole(DataAllocator &dataAllocator, FontContext &fontContext,
            visibleLines.size + 1)
 
 {
-    float marginBottomTop = 0.5f;
-    float lineSpacing = 0.1f;
-    float spacingInputOutput = 0.6f;
+    const float marginBottomTop = 0.5f;
+    const float lineSpacing = 0.1f;
+    const float spacingInputOutput = 0.6f;
 
-    float marginLeft = 10;
+    const float marginLeft = 10;
 
     auto mat = Matrix4x4f::ortho(4.f / 3.f);
 
-    float scale = ((visibleLines.size + 1) * 1);
-    scale += ((visibleLines.size - 1) * lineSpacing);
+    float scale = (float)((visibleLines.size + 1) * 1);
+    scale += (float)((float)(visibleLines.size - 1) * lineSpacing);
     scale += marginBottomTop * 2;
     scale += spacingInputOutput;
 
@@ -107,7 +120,7 @@ void GLConsole::addLine(const LineColor<80> &lineColor) {
 }
 
 void GLConsole::up() {
-    size_t last = arraySize(logBuffer.lines) - visibleLines.size;
+    const size_t last = arraySize(logBuffer.lines) - visibleLines.size;
 
     if (cline + 1 <= last) {
         cline++;
@@ -115,7 +128,7 @@ void GLConsole::up() {
 }
 
 void GLConsole::pageUp() {
-    size_t last = arraySize(logBuffer.lines) - visibleLines.size;
+    const size_t last = arraySize(logBuffer.lines) - visibleLines.size;
 
     if (cline + visibleLines.size <= last) {
         cline += visibleLines.size;
@@ -155,7 +168,7 @@ void GLConsole::ready() {
                 vec[c] = palette.colors[line->colors[c]];
             }
 
-            visibleLines[i].setColor({vec}, arraySize(vec));
+            visibleLines[i].setColor(vec, arraySize(vec));
         }
     }
 }

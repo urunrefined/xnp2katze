@@ -16,8 +16,7 @@ class SwapChainSupportDetails {
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 
-    SwapChainSupportDetails(const VkPhysicalDevice device,
-                            const VkSurfaceKHR surface);
+    SwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface);
 };
 
 uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,

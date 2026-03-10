@@ -1,4 +1,5 @@
 #include "VKImageView.h"
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

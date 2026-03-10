@@ -1,4 +1,7 @@
 #include "GLGlyphCache.h"
+#include "util/Deep.h"
+#include "vk/VKPhysicalDevice.h"
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

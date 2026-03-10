@@ -1,4 +1,13 @@
 #include "VKRenderBuffer.h"
+#include "vk/VKCommandPool.h"
+#include "vk/VKFramebuffer.h"
+#include "vk/VKRenderPass.h"
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

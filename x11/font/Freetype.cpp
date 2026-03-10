@@ -1,4 +1,7 @@
 #include "Freetype.h"
+#include <cstdio>
+#include <freetype/freetype.h>
+#include <freetype/fttypes.h>
 
 namespace BR {
 
@@ -21,12 +24,13 @@ FreetypeFace::FreetypeFace(FreetypeLib &library, const char *fontfile,
     }
 
     printf("pxSize-- %u\n", pxSize);
-    FT_Set_Char_Size(face, pxSize * 64, pxSize * 64, 0, 0);
+    FT_Set_Char_Size(face, (FT_F26Dot6)pxSize * 64, (FT_F26Dot6)pxSize * 64, 0,
+                     0);
 
-    descender = face->size->metrics.descender / pxSize + 1;
+    //    descender = face->size->metrics.descender / pxSize + 1;
     lineheight = (face->size->metrics.height / pxSize) + 1;
     printf("lineheight: %u\n", lineheight);
-    printf("descender: %d\n", descender);
+    //    printf("descender: %u\n", descender);
 
     slot = face->glyph;
 }

@@ -20,7 +20,7 @@ class FreetypeFace {
     FT_Face face = 0;
     FT_UInt pxSize = 0;
 
-    int32_t descender;
+    //    uint32_t descender;
     uint32_t lineheight;
     FT_GlyphSlot slot;
 

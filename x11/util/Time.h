@@ -15,8 +15,8 @@ class Time {
     Time(time_t nanoSeconds) {
         clock_gettime(CLOCK_MONOTONIC, &cur);
 
-        uint32_t sec = nanoSeconds / 1'000'000'000;
-        uint32_t nsec = nanoSeconds % 1'000'000'000;
+        const uint32_t sec = nanoSeconds / 1'000'000'000;
+        const uint32_t nsec = nanoSeconds % 1'000'000'000;
 
         cur.tv_sec += sec;
         cur.tv_nsec += nsec;

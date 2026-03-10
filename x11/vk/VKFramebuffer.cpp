@@ -1,4 +1,8 @@
 #include "VKFramebuffer.h"
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

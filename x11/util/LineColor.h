@@ -49,8 +49,8 @@ template <size_t N> struct LineColor {
     size_t cur = 0;
 
     LineColor &operator<<(const FormatString &formatString) {
-        size_t rem = N - cur;
-        size_t copy = std::min(rem, strlen(formatString.text));
+        const size_t rem = N - cur;
+        const size_t copy = std::min(rem, strlen(formatString.text));
 
         for (size_t i = 0; i < copy; i++) {
             text[cur] = formatString.text[i];
@@ -68,7 +68,7 @@ template <size_t N> struct LineColor {
 
         size_t copy = formatPad.padLeft - cur;
 
-        size_t rem = N - cur;
+        const size_t rem = N - cur;
 
         copy = std::min(rem, copy);
 

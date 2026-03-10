@@ -1,9 +1,14 @@
 #include "Deep.h"
 #include "Vertex.h"
+#include "util/Image.h"
+#include "util/Rect.h"
+#include "util/Vec.h"
 
 #include <algorithm>
 
+#include <cstdint>
 #include <string.h>
+#include <vector>
 
 namespace BR {
 
@@ -65,45 +70,52 @@ static uint16_t addAll(const std::vector<LineSegment> &segments) {
 void doubleBlankLinesAdaptive(uint16_t width, uint16_t height,
                               const unsigned char *in, unsigned char *out,
                               uint16_t cutOff) {
-    memcpy(out, in, width * 4);
+    memcpy(out, in, (size_t)width * 4);
 
     for (uint16_t h = 1; h < height - 1; h++) {
-        if (lineHasData(in + (h + 1) * width * 4, width)) {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
-            auto lineSegments = getLineSegments(in + (h)*width * 4, width, 30);
+        if (lineHasData(in + ((size_t)h + 1) * width * 4, width)) {
+            memcpy(out + ((size_t)h) * width * 4, in + ((size_t)h) * width * 4,
+                   (size_t)width * 4);
+            auto lineSegments = getLineSegments(in + ((size_t)h) * width * 4,
+                                                (size_t)width, 30);
 
             if (addAll(lineSegments) > cutOff) {
                 for (auto &lineSegment : lineSegments) {
 
-                    memcpy(out + (h)*width * 4 + (lineSegment.start * 4),
-                           in + (h - 1) * width * 4 + (lineSegment.start * 4),
-                           lineSegment.size * 4);
+                    memcpy(out + ((size_t)h) * width * 4 +
+                               ((size_t)lineSegment.start * 4),
+                           in + ((size_t)h - 1) * width * 4 +
+                               ((size_t)lineSegment.start * 4),
+                           (size_t)lineSegment.size * 4);
                 }
             }
         } else {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
+            memcpy(out + ((size_t)h) * width * 4, in + ((size_t)h) * width * 4,
+                   (size_t)width * 4);
         }
     }
 
-    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
-           width * 4);
+    memcpy(out + (((size_t)height - 1) * width * 4),
+           in + (((size_t)height - 1) * width * 4), (size_t)width * 4);
 }
 
 void doubleBlankLines(uint16_t width, uint16_t height, const unsigned char *in,
                       unsigned char *out) {
-    memcpy(out, in, width * 4);
+    memcpy(out, in, (size_t)width * 4);
 
     for (uint16_t h = 1; h < height - 1; h++) {
-        if (!lineHasData(in + h * width * 4, width) &&
-            lineHasData(in + (h + 1) * width * 4, width)) {
-            memcpy(out + (h)*width * 4, in + (h - 1) * width * 4, width * 4);
+        if (!lineHasData(in + (size_t)h * width * 4, width) &&
+            lineHasData(in + ((size_t)h + 1) * width * 4, width)) {
+            memcpy(out + ((size_t)h) * width * 4,
+                   in + ((size_t)h - 1) * width * 4, (size_t)width * 4);
         } else {
-            memcpy(out + (h)*width * 4, in + (h)*width * 4, width * 4);
+            memcpy(out + ((size_t)h) * width * 4, in + ((size_t)h) * width * 4,
+                   (size_t)width * 4);
         }
     }
 
-    memcpy(out + ((height - 1) * width * 4), in + ((height - 1) * width * 4),
-           width * 4);
+    memcpy(out + (((size_t)height - 1) * width * 4),
+           in + (((size_t)height - 1) * width * 4), (size_t)width * 4);
 }
 
 void fill(const ImageBGRA &image, const ColorU8BGRA &color) {
@@ -118,19 +130,19 @@ void fill(const ImageBGRA &image, const ColorU8BGRA &color) {
 }
 
 void fill(const Image8 &image, uint8_t color) {
-    memset(image.data, color, image.width * image.height);
+    memset(image.data, color, (size_t)image.width * image.height);
 }
 
 void fill(const Image8 &image) { fill(image, 0); }
 
 static size_t px4(uint16_t imageWidth, uint16_t x, uint16_t y) {
-    return (y * imageWidth + x) * 4;
+    return ((size_t)y * imageWidth + x) * 4;
 }
 
 void fill(const ImageBGRA &image) {
     auto data = image.data;
 
-    memset(data, 0, image.width * image.height * 4);
+    memset(data, 0, (size_t)image.width * image.height * 4);
 }
 
 void fill(const ImageBGRA &image, const Rect &rect, const ColorU8BGRA &color) {
@@ -139,18 +151,18 @@ void fill(const ImageBGRA &image, const Rect &rect, const ColorU8BGRA &color) {
     if (rect.offsetY >= image.height)
         return;
 
-    uint16_t xToEdge = image.width - rect.offsetX;
-    uint16_t yToEdge = image.height - rect.offsetY;
+    const uint16_t xToEdge = image.width - rect.offsetX;
+    const uint16_t yToEdge = image.height - rect.offsetY;
 
-    uint16_t xEnd = rect.offsetX + std::min(xToEdge, rect.sizeX);
-    uint16_t yEnd = rect.offsetY + std::min(yToEdge, rect.sizeY);
+    const uint16_t xEnd = rect.offsetX + std::min(xToEdge, rect.sizeX);
+    const uint16_t yEnd = rect.offsetY + std::min(yToEdge, rect.sizeY);
 
     auto data = image.data;
 
     for (auto y = rect.offsetY; y < yEnd; y++) {
         for (auto x = rect.offsetX; x < xEnd; x++) {
 
-            size_t offset = px4(image.width, x, y);
+            const size_t offset = px4(image.width, x, y);
 
             data[offset + 0] = color.b;
             data[offset + 1] = color.g;
@@ -165,7 +177,7 @@ static void createHorizLine(const ImageBGRA &image, uint16_t y,
     auto data = image.data;
 
     for (auto x = 0; x < image.width; x++) {
-        size_t offset = px4(image.width, x, y);
+        const size_t offset = px4(image.width, x, y);
 
         data[offset + 0] = color.b;
         data[offset + 1] = color.g;
@@ -179,7 +191,7 @@ static void createVertLine(const ImageBGRA &image, uint16_t x,
     auto data = image.data;
 
     for (auto y = 0; y < image.height; y++) {
-        size_t offset = px4(image.width, x, y);
+        const size_t offset = px4(image.width, x, y);
 
         data[offset + 0] = color.b;
         data[offset + 1] = color.g;
@@ -202,10 +214,10 @@ void createGrid(const ImageBGRA &image, uint16_t everyX, uint16_t everyY,
 void get2DRectCW(const Vec2 &begin, const Vec2 &sz, Vec2 (&ret)[6]) {
     // clang-format off
 
-  Vec2 bl {begin.x       , begin.y        };
-  Vec2 ul {begin.x       , begin.y + sz.y };
-  Vec2 ur {begin.x + sz.x, begin.y + sz.y };
-  Vec2 br {begin.x + sz.x, begin.y        };
+  Vec2 const bl {begin.x       , begin.y        };
+  Vec2 const ul {begin.x       , begin.y + sz.y };
+  Vec2 const ur {begin.x + sz.x, begin.y + sz.y };
+  Vec2 const br {begin.x + sz.x, begin.y        };
 
     // clang-format on
 

@@ -1,4 +1,6 @@
 #include "Input.h"
+#include <algorithm>
+#include <cstddef>
 
 namespace BR {
 
@@ -45,8 +47,8 @@ void Input::reset() {
 }
 
 void Input::moveMouse(float x, float y) {
-    mouse_x += x * 0.1;
-    mouse_y += y * 0.1;
+    mouse_x += x * 0.1f;
+    mouse_y += y * 0.1f;
 
     if (mouse_x < 0)
         mouse_x = 0;

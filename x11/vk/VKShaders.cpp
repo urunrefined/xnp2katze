@@ -1,6 +1,12 @@
 #include "VKShaders.h"
 
+#include <cstdint>
+#include <cstdio>
 #include <fstream>
+#include <ios>
+#include <string>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -11,7 +17,12 @@ static std::vector<char> readFile(const std::string &filename) {
         throw std::string("failed to open file!") + filename;
     }
 
-    size_t fileSize = (size_t)file.tellg();
+    const std::streamsize fileSize = file.tellg();
+
+    if (fileSize == -1) {
+        throw std::string("failed tell filesize!") + filename;
+    }
+
     std::vector<char> buffer(fileSize);
 
     file.seekg(0);
@@ -24,11 +35,11 @@ static std::vector<char> readFile(const std::string &filename) {
 
 static std::vector<char> readShaderFile(const char *filename) {
     try {
-        std::string shaderFilename(std::string("x11/shader/") + filename);
+        const std::string shaderFilename(std::string("x11/shader/") + filename);
         printf("Try relative shaderfilename: %s\n", shaderFilename.c_str());
         return readFile(shaderFilename);
     } catch (...) {
-        std::string shaderFilename(std::string("/usr/share/xnp2katze/") +
+        const std::string shaderFilename(std::string("/usr/share/xnp2katze/") +
                                    filename);
         printf("Try global shaderfilename: %s\n", shaderFilename.c_str());
         return readFile(shaderFilename);

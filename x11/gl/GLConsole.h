@@ -61,7 +61,7 @@ class GLConsole {
 
         for (size_t i = 0; i < visibleLines.size; i++) {
 
-            GLTextColors &text = visibleLines[i];
+            const GLTextColors &text = visibleLines[i];
             pipeline.record(commandBuffers, bufferCount, sets.get(i + 1),
                             *text.vtxs.gBuffer, text.vtxs.byteOffset,
                             *text.uvs.gBuffer, text.uvs.byteOffset,

@@ -1,6 +1,10 @@
 #include "VKPipelineTexExt.h"
-#include "util/Core.h"
 #include "util/Vertex.h"
+#include "vk/VKRenderOptions.h"
+#include "vk/VKShaders.h"
+#include <cstddef>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -38,10 +42,10 @@ static VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
     .pVertexAttributeDescriptions = attributeDescriptions,
 };
 
-PipelineTexExt::PipelineTexExt(const VkDevice device, ShaderStore &shader3D,
+PipelineTexExt::PipelineTexExt(VkDevice device, ShaderStore &shader3D,
                                const RenderOptions &renderOptions,
-                               const VkRenderPass renderPass,
-                               const VkDescriptorSetLayout desciptorSetLayout)
+                               VkRenderPass renderPass,
+                               VkDescriptorSetLayout desciptorSetLayout)
     : pipelineLayout(device, desciptorSetLayout),
       pipeline(device, shader3D.vertTexExt, shader3D.fragTex, vertexInputInfo,
                renderOptions.scissor, renderPass, pipelineLayout,
@@ -53,17 +57,16 @@ PipelineTexExt::PipelineTexExt(const VkDevice device, ShaderStore &shader3D,
 PipelineTexExt::~PipelineTexExt() {}
 
 void PipelineTexExt::record(VkCommandBuffer *commandBuffers, size_t bufferCount,
-                            const VkDescriptorSet descriptorSet,
-                            const VkBuffer vertices,
-                            VkDeviceSize verticesOffset, const VkBuffer uvs,
+                            VkDescriptorSet descriptorSet, VkBuffer vertices,
+                            VkDeviceSize verticesOffset, VkBuffer uvs,
                             VkDeviceSize uvOffset, size_t drawCount) {
     if (!drawCount)
         return;
 
     for (size_t i = 0; i < bufferCount; i++) {
 
-        VkBuffer buffers[2] = {vertices, uvs};
-        VkDeviceSize bufferSizes[2] = {verticesOffset, uvOffset};
+        const VkBuffer buffers[2] = {vertices, uvs};
+        const VkDeviceSize bufferSizes[2] = {verticesOffset, uvOffset};
 
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 2, buffers, bufferSizes);
 

@@ -3,11 +3,14 @@
 
 #include "util/Bitset.h"
 
+#include <algorithm>
+#include <cstdint>
 #include <stdio.h>
 
 #include <array>
 #include <limits>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -40,7 +43,7 @@ static VkPresentModeKHR chooseSwapPresentMode(
     std::array<VkPresentModeKHR, 4> priorities{
         VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_FIFO_RELAXED_KHR,
         VK_PRESENT_MODE_FIFO_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR};
-    const char *priorityStrings[priorities.size()] = {
+    const char *const priorityStrings[priorities.size()] = {
         "MAILBOX KHR", "RELAXED KHR", "FIFO KHR", "IMMEDIATE KHR"};
 
     for (const auto &availablePresentMode : availablePresentModes) {
@@ -89,14 +92,14 @@ VulkanSwapChain::VulkanSwapChain(VkDevice device,
                                  uint32_t width, uint32_t height,
                                  VulkanSwapChain *oldSwapChain)
     : device(device) {
-    SwapChainSupportDetails swapChainSupport(physicalDevice, surface);
+    const SwapChainSupportDetails swapChainSupport(physicalDevice, surface);
 
-    VkSurfaceFormatKHR surfaceFormat =
+    const VkSurfaceFormatKHR surfaceFormat =
         chooseSwapSurfaceFormat(swapChainSupport.formats);
 
     format = surfaceFormat.format;
 
-    VkPresentModeKHR presentMode =
+    const VkPresentModeKHR presentMode =
         chooseSwapPresentMode(swapChainSupport.presentModes);
     extent = chooseSwapExtent(swapChainSupport.capabilities, width, height);
 

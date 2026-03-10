@@ -1,4 +1,5 @@
 #include "Time.h"
+#include <ctime>
 
 namespace BR {
 

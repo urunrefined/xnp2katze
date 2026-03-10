@@ -76,9 +76,7 @@ class MainContext {
     MainContext(VulkanDevice &device, VulkanPhysicalDevice &physicalDevice,
                 std::unique_ptr<VulkanWindowContext> &&windowContext)
         : device(device), physicalDevice(physicalDevice),
-          windowContext(std::move(windowContext)) {
-        this->windowContext->glfwSurface.getCurrentSize();
-    }
+          windowContext(std::move(windowContext)), dims({0, 0}) {}
 
     void createRender(VulkanRenderPass &renderPass,
                       VkFormat renderDepthFormat) {

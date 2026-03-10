@@ -1,6 +1,11 @@
 #include "VKPipelineTexExtIy.h"
 #include "util/Core.h"
 #include "util/Vertex.h"
+#include "vk/VKRenderOptions.h"
+#include "vk/VKShaders.h"
+#include <cstddef>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -63,7 +68,7 @@ void PipelineTexExtIy::record(VkCommandBuffer *commandBuffers,
 
     for (size_t i = 0; i < bufferCount; i++) {
 
-        VkBuffer buffers[2] = {vertices, uvs};
+        const VkBuffer buffers[2] = {vertices, uvs};
         VkDeviceSize bufferSizes[2] = {verticesOffset, uvOffset};
 
         vkCmdBindVertexBuffers(commandBuffers[i], 0, arraySize(buffers),

@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 namespace BR {
@@ -9,13 +10,13 @@ namespace BR {
 template <size_t T1> class Bitset {
   private:
     size_t size = T1;
-    char bitset[T1 / 8 + ((T1 % 8))];
+    uint8_t bitset[T1 / 8 + ((T1 % 8))];
 
   public:
     Bitset() {}
 
     bool operator()(size_t pos) const {
-        char mod = pos % 8;
+        const uint8_t mod = pos % 8;
         pos /= 8;
 
         assert(pos < size);
@@ -23,7 +24,7 @@ template <size_t T1> class Bitset {
     }
 
     void set(size_t pos) {
-        char mod = pos % 8;
+        const uint8_t mod = pos % 8;
         pos /= 8;
 
         assert(pos < size);
@@ -31,7 +32,7 @@ template <size_t T1> class Bitset {
     }
 
     void clear(size_t pos) {
-        char mod = pos % 8;
+        const uint8_t mod = pos % 8;
         pos /= 8;
 
         assert(pos < size);

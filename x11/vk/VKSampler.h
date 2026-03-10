@@ -5,7 +5,7 @@
 namespace BR {
 
 class VulkanSampler {
-    const VkDevice device;
+    VkDevice device;
 
   public:
     VkSampler sampler;

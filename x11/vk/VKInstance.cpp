@@ -1,7 +1,8 @@
 #include "VKInstance.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdint>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

@@ -1,5 +1,17 @@
 #include "VKScaler.h"
+#include "util/Range.h"
+#include "vk/VKBuffers.h"
+#include "vk/VKCommandBuffer.h"
+#include "vk/VKRenderBuffer.h"
+#include "vk/VKSync.h"
+#include "vk/VKTexture.h"
 #include <assert.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <memory>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -27,9 +39,9 @@ static RenderState aquireImage(VkDevice &device,
                                uint32_t &imageIndex) {
     imageSitter.activate();
 
-    VkResult resultImage = vkAcquireNextImageKHR(device, swapchainImages, 0,
-                                                 imageAvailableSemaphore,
-                                                 imageSitter, &imageIndex);
+    const VkResult resultImage = vkAcquireNextImageKHR(
+        device, swapchainImages, 0, imageAvailableSemaphore, imageSitter,
+        &imageIndex);
 
     if (resultImage == VK_NOT_READY || resultImage == VK_TIMEOUT) {
         imageSitter.cancel();
@@ -70,13 +82,13 @@ static RenderState presentIfFinished(VulkanSemaphore &renderFinishedSemaphore,
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = renderFinishedSemaphore;
 
-    VkSwapchainKHR swapChains[] = {swapchain};
+    const VkSwapchainKHR swapChains[] = {swapchain};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
     presentInfo.pImageIndices = &imageIndex;
 
-    VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    const VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         // Nothing. Will be handled the next time we update
@@ -101,7 +113,7 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
 
     uint32_t imageIndex;
 
-    RenderState renderState =
+    const RenderState renderState =
         aquireImage(device, swapchainImages, imageSitter,
                     renderSemaphores.imageAvailableSemaphore, imageIndex);
 
@@ -124,7 +136,8 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
     (*commandBuffer).end();
 
     VkSubmitInfo submitInfo[2] = {};
-    VkPipelineStageFlags flagsWaitForImage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    const VkPipelineStageFlags flagsWaitForImage =
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
     {
         VkSubmitInfo &updateSubmitInfo = submitInfo[0];
@@ -143,7 +156,7 @@ RenderIdx VulkanScaler::draw(VulkanRenderBuffer &renderBuffer,
             renderSemaphores.vboUpdatedSemaphore;
     }
 
-    VkPipelineStageFlags flagsWaitForVBOUpdate =
+    const VkPipelineStageFlags flagsWaitForVBOUpdate =
         VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     {

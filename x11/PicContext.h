@@ -26,7 +26,7 @@ class PicContext : public MainContext {
     VulkanDescriptorPool descriptorPool;
     VulkanDescriptorSet descriptorSetMain;
     std::unique_ptr<PipelineTex> pipeline;
-    std::vector<char> img;
+    std::vector<uint8_t> img;
     CallbackContext ctx;
     Sfx::PulseSoundEngine &soundEngine;
     InputMapper &inputMapper;

@@ -38,9 +38,8 @@ class VulkanTextureGeneric {
     VulkanBufferGeneric stagingBuffer;
     void *data;
 
-    VulkanTextureGeneric(const VkDevice device,
-                         const VkPhysicalDevice physicalDevice, uint16_t width,
-                         uint16_t height, VkFormat format,
+    VulkanTextureGeneric(VkDevice device, VkPhysicalDevice physicalDevice,
+                         uint16_t width, uint16_t height, VkFormat format,
                          VkBufferUsageFlagBits hostUsage,
                          VkImageUsageFlagBits deviceUsage)
         :
@@ -53,15 +52,15 @@ class VulkanTextureGeneric {
 
           textureView(device, texture, format, VK_IMAGE_ASPECT_COLOR_BIT),
           textureDirty(true),
-          stagingBuffer(device, physicalDevice, width * height * components,
-                        hostUsage,
+          stagingBuffer(device, physicalDevice,
+                        (VkDeviceSize)width * height * components, hostUsage,
                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)
 
     {
 
-        vkMapMemory(device, stagingBuffer, 0, width * height * components, 0,
-                    &data);
+        vkMapMemory(device, stagingBuffer, 0,
+                    (VkDeviceSize)width * height * components, 0, &data);
     }
 
     ~VulkanTextureGeneric() { vkUnmapMemory(device, stagingBuffer); }
@@ -75,22 +74,20 @@ class VulkanTextureGeneric {
 
 class VulkanTextureBGRA : public VulkanTextureGeneric {
   public:
-    VulkanTextureBGRA(const VkDevice device,
-                      const VkPhysicalDevice physicalDevice, uint16_t width,
-                      uint16_t height)
+    VulkanTextureBGRA(VkDevice device, VkPhysicalDevice physicalDevice,
+                      uint16_t width, uint16_t height)
         : VulkanTextureGeneric(
               device, physicalDevice, width, height, VK_FORMAT_B8G8R8A8_UNORM,
               VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
               (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
                                      VK_IMAGE_USAGE_SAMPLED_BIT)) {}
 
-    operator ImageBGRA() { return ImageBGRA{width, height, (char *)data}; }
+    operator ImageBGRA() { return ImageBGRA{width, height, (uint8_t *)data}; }
 };
 
 class VulkanTextureBGRARender : public VulkanTextureGeneric {
   public:
-    VulkanTextureBGRARender(const VkDevice device,
-                            const VkPhysicalDevice physicalDevice,
+    VulkanTextureBGRARender(VkDevice device, VkPhysicalDevice physicalDevice,
                             uint16_t width, uint16_t height)
         : VulkanTextureGeneric(
               device, physicalDevice, width, height, VK_FORMAT_B8G8R8A8_UNORM,
@@ -101,12 +98,12 @@ class VulkanTextureBGRARender : public VulkanTextureGeneric {
 
                   VK_IMAGE_USAGE_TRANSFER_SRC_BIT)) {}
 
-    operator ImageBGRA() { return ImageBGRA{width, height, (char *)data}; }
+    operator ImageBGRA() { return ImageBGRA{width, height, (uint8_t *)data}; }
 };
 
 class VulkanTexture8 : public VulkanTextureGeneric {
   public:
-    VulkanTexture8(const VkDevice device, const VkPhysicalDevice physicalDevice,
+    VulkanTexture8(VkDevice device, VkPhysicalDevice physicalDevice,
                    uint16_t width, uint16_t height)
         : VulkanTextureGeneric(
               device, physicalDevice, width, height, VK_FORMAT_R8_UNORM,
@@ -114,7 +111,7 @@ class VulkanTexture8 : public VulkanTextureGeneric {
               (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
                                      VK_IMAGE_USAGE_SAMPLED_BIT)) {}
 
-    operator Image8() { return Image8{width, height, (char *)data}; }
+    operator Image8() { return Image8{width, height, (uint8_t *)data}; }
 };
 
 } // namespace BR

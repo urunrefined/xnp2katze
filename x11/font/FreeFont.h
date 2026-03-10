@@ -18,34 +18,6 @@
 
 namespace BR {
 
-class TextDims {
-  public:
-    long startX = 0, startY = 0;
-    long sizeX = 0, sizeY = 0;
-
-    TextDims(long startX_, long startY_, long sizeX_, long sizeY_)
-        : startX(startX_), startY(startY_), sizeX(sizeX_), sizeY(sizeY_) {}
-
-    TextDims() {}
-
-    TextDims operator+=(const TextDims &dims) {
-        long minX = std::min(startX, dims.startX);
-        long minY = std::min(startY, dims.startY);
-
-        long maxX = std::max(startX + sizeX, dims.startX + dims.sizeX);
-        long maxY = std::max(startY + sizeY, dims.startY + dims.sizeY);
-
-        startX = minX;
-        startX = minY;
-        sizeX = maxX - minX;
-        sizeY = maxY - minY;
-
-        return *this;
-    }
-
-    ~TextDims() {}
-};
-
 struct Mapping {
     hb_codepoint_t codepoint;
     uint32_t idx;

@@ -5,7 +5,7 @@
 namespace BR {
 
 class VulkanCommandPool {
-    const VkDevice device;
+    VkDevice device;
 
   public:
     VkCommandPool commandPool;

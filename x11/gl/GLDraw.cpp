@@ -1,5 +1,10 @@
 
 #include "GLDraw.h"
+#include "gl/GLText.h"
+#include "vk/VKDescriptorSetExt.h"
+#include "vk/VKPipelineTexExtIyColor.h"
+#include <cstddef>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

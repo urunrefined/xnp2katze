@@ -1,6 +1,8 @@
 
 #include "VKPipeline.h"
 #include "util/Core.h"
+#include "vk/VKShaders.h"
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

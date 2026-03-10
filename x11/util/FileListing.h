@@ -20,9 +20,9 @@ class Directory {
         }
     }
 
-    dirent *getNextRegular() const {
+    const dirent *getNextRegular() const {
         while (1) {
-            dirent *p = readdir(dir);
+            const dirent *p = readdir(dir);
 
             if (!p)
                 return 0;
@@ -43,10 +43,10 @@ class FileListing {
     FileListing(const char *dirName_) : dirName(dirName_) { refresh(); }
 
     void refresh() {
-        Directory directory(dirName.c_str());
+        const Directory directory(dirName.c_str());
 
         while (1) {
-            dirent *entry = directory.getNextRegular();
+            const dirent *entry = directory.getNextRegular();
 
             if (!entry)
                 break;

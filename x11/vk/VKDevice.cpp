@@ -1,12 +1,12 @@
 #include "VKDevice.h"
 
 #include "VKUtil.h"
-#include <vulkan/vulkan.h>
+#include <cstdint>
 
 #include <set>
 #include <vector>
 
-#include <stdio.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -20,16 +20,16 @@ VulkanDevice::VulkanDevice(
     VkSurfaceKHR surface,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
-    uint32_t presentIdx =
+    const uint32_t presentIdx =
         getFirstPresentQueue(physicalDevice, surface, queueFamilies);
-    uint32_t graphicsIdx =
+    const uint32_t graphicsIdx =
         getFirstGraphicsQueue(physicalDevice, surface, queueFamilies);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {graphicsIdx, presentIdx};
+    const std::set<uint32_t> uniqueQueueFamilies = {graphicsIdx, presentIdx};
 
-    float queuePriority = 1.0f;
-    for (int queueFamily : uniqueQueueFamilies) {
+    const float queuePriority = 1.0f;
+    for (auto queueFamily : uniqueQueueFamilies) {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily;
@@ -49,7 +49,7 @@ VulkanDevice::VulkanDevice(
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    const char *extensions[]{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const char *const extensions[]{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     createInfo.enabledExtensionCount =
         sizeof(extensions) / sizeof(extensions[0]);
@@ -83,13 +83,13 @@ VulkanPureDevice::VulkanPureDevice(
     bool enableValidationLayer, VkPhysicalDevice physicalDevice,
     const std::vector<VkQueueFamilyProperties> &queueFamilies) {
 
-    uint32_t graphicsIdx = getFirstGraphicsQueue(queueFamilies);
+    const uint32_t graphicsIdx = getFirstGraphicsQueue(queueFamilies);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {graphicsIdx};
+    const std::set<uint32_t> uniqueQueueFamilies = {graphicsIdx};
 
-    float queuePriority = 1.0f;
-    for (int queueFamily : uniqueQueueFamilies) {
+    const float queuePriority = 1.0f;
+    for (const auto queueFamily : uniqueQueueFamilies) {
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily;

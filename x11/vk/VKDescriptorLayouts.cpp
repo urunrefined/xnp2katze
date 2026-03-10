@@ -1,4 +1,5 @@
 #include "VKDescriptorLayouts.h"
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

@@ -7,7 +7,7 @@
 namespace BR {
 
 class VulkanPipelineLayout {
-    const VkDevice device;
+    VkDevice device;
 
   public:
     VkPipelineLayout pipelineLayout;
@@ -20,7 +20,7 @@ class VulkanPipelineLayout {
 };
 
 class VulkanPipeline {
-    const VkDevice device;
+    VkDevice device;
 
   public:
     VkPipeline pipeline;

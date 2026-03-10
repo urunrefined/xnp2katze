@@ -1,17 +1,18 @@
 
-#include <array>
-#include <fstream>
-#include <memory>
-#include <new>
-#include <set>
+#include <algorithm>
+#include <cstdint>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 #include "VKUtil.h"
+#include "vk/VKInstance.h"
+#include "vk/VKPhysicalDevice.h"
+#include "vk/VKPhysicalDeviceEnumerations.h"
 
 namespace BR {
 
-uint32_t findMemoryType(const VkPhysicalDevice physicalDevice,
-                        uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
+                        VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
@@ -28,19 +29,19 @@ uint32_t findMemoryType(const VkPhysicalDevice physicalDevice,
 
 VkRect2D getIntegerScissor(unsigned int multipleX, unsigned int multipleY,
                            unsigned int width, unsigned int height) {
-    unsigned int divX = width / multipleX;
-    unsigned int divY = height / multipleY;
+    const unsigned int divX = width / multipleX;
+    const unsigned int divY = height / multipleY;
 
     if (divX == 0 || divY == 0)
         return {{0, 0}, {width, height}};
 
-    unsigned int leastCommonDenominator = std::min(divX, divY);
+    const unsigned int leastCommonDenominator = std::min(divX, divY);
 
     uint32_t extentX = leastCommonDenominator * multipleX;
     uint32_t extentY = leastCommonDenominator * multipleY;
 
-    int32_t offsetX = (width - extentX) / 2;
-    int32_t offsetY = (height - extentY) / 2;
+    int32_t offsetX = ((int32_t)width - (int32_t)extentX) / 2;
+    int32_t offsetY = ((int32_t)height - (int32_t)extentY) / 2;
 
     return {{offsetX, offsetY}, {extentX, extentY}};
 }
@@ -50,7 +51,7 @@ VkRect2D getAspectScissor(double ideal, unsigned int width,
     unsigned int xOffset = 0;
     unsigned int yOffset = 0;
 
-    double ratio = (double)width / (double)height;
+    const double ratio = (double)width / (double)height;
 
     if (ratio > ideal) {
         xOffset = (width - (unsigned int)((double)width / (ratio / ideal)));
@@ -101,8 +102,8 @@ VkRect2D get1to1Scissor(unsigned int width, unsigned int height) {
     return scissor;
 }
 
-SwapChainSupportDetails::SwapChainSupportDetails(const VkPhysicalDevice device,
-                                                 const VkSurfaceKHR surface) {
+SwapChainSupportDetails::SwapChainSupportDetails(VkPhysicalDevice device,
+                                                 VkSurfaceKHR surface) {
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &capabilities);
 
@@ -127,19 +128,18 @@ SwapChainSupportDetails::SwapChainSupportDetails(const VkPhysicalDevice device,
     }
 }
 
-static VkFormat findSupportedFormat(const VkPhysicalDevice physicalDevice,
+static VkFormat findSupportedFormat(VkPhysicalDevice physicalDevice,
                                     const std::vector<VkFormat> &candidates,
                                     VkImageTiling tiling,
                                     VkFormatFeatureFlags features) {
-    for (VkFormat format : candidates) {
+    for (const VkFormat format : candidates) {
         VkFormatProperties props;
         vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
 
-        if (tiling == VK_IMAGE_TILING_LINEAR &&
-            (props.linearTilingFeatures & features) == features) {
-            return format;
-        } else if (tiling == VK_IMAGE_TILING_OPTIMAL &&
-                   (props.optimalTilingFeatures & features) == features) {
+        if ((tiling == VK_IMAGE_TILING_LINEAR &&
+             (props.linearTilingFeatures & features) == features) ||
+            (tiling == VK_IMAGE_TILING_OPTIMAL &&
+             (props.optimalTilingFeatures & features) == features)) {
             return format;
         }
     }
@@ -271,7 +271,8 @@ bool getFirstGraphicsQueue(
           "available";
 }
 
-std::vector<VkQueueFamilyProperties>
+/*
+static std::vector<VkQueueFamilyProperties>
 findQueueFamilies(VkPhysicalDevice physicalDevice) {
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount,
@@ -282,7 +283,7 @@ findQueueFamilies(VkPhysicalDevice physicalDevice) {
                                              queueFamilies.data());
 
     return queueFamilies;
-}
+}*/
 
 VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanInstance &instance,
                                                VkSurfaceKHR surface) {
@@ -300,9 +301,9 @@ VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanInstance &instance,
 }
 
 VulkanPhysicalDevice glPhysicalDeviceSelection(VulkanInstance &instance) {
-    BR::VulkanPhysicalDeviceEnumerations physicalDeviceEnums(instance);
+    const BR::VulkanPhysicalDeviceEnumerations physicalDeviceEnums(instance);
 
-    for (BR::VulkanPhysicalDevice &physicalDevice :
+    for (const BR::VulkanPhysicalDevice &physicalDevice :
          physicalDeviceEnums.physicalDevices) {
         // Use the first one available
         return physicalDevice;

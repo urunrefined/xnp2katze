@@ -1,7 +1,11 @@
 #include "Harfbuzz.h"
 
+#include <cstdint>
+#include <freetype/freetype.h>
 #include <hb-ft.h>
+#include <hb.h>
 #include <stdio.h>
+#include <vector>
 
 namespace BR {
 
@@ -46,10 +50,10 @@ HarfbuzzText::HarfbuzzText(const std::vector<uint32_t> &codePoints,
 void HarfbuzzText::print() {
 
     for (unsigned int i = 0; i < glyph_count; i++) {
-        hb_position_t x_offset = glyph_pos[i].x_offset;
-        hb_position_t y_offset = glyph_pos[i].y_offset;
-        hb_position_t x_advance = glyph_pos[i].x_advance;
-        hb_position_t y_advance = glyph_pos[i].y_advance;
+        const hb_position_t x_offset = glyph_pos[i].x_offset;
+        const hb_position_t y_offset = glyph_pos[i].y_offset;
+        const hb_position_t x_advance = glyph_pos[i].x_advance;
+        const hb_position_t y_advance = glyph_pos[i].y_advance;
 
         //    hb_font_extents_t temp;
 

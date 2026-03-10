@@ -2,6 +2,7 @@
 #include "VKUtil.h"
 
 #include <string.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

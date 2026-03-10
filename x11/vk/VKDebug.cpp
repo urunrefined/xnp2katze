@@ -1,6 +1,10 @@
 #include "VKDebug.h"
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
+#include <vulkan/vk_platform.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -42,7 +46,7 @@ VulkanDebugCallback::VulkanDebugCallback(VkInstance &instance_,
     if (!enableValidationLayers)
         return;
 
-    int debugRet = createDebugReportCallbackEXT();
+    const int debugRet = createDebugReportCallbackEXT();
 
     if (debugRet != VK_SUCCESS) {
         throw "failed to set up debug callback!";

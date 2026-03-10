@@ -1,6 +1,7 @@
 #include "VKTexture.h"
-#include "VKBuffers.h"
 #include "VKCommandBuffer.h"
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -81,9 +82,10 @@ transitionImageLayoutToFetchable(VkImage image,
     barrier.subresourceRange.baseArrayLayer = 0;
     barrier.subresourceRange.layerCount = 1;
 
-    VkPipelineStageFlags sourceStage =
+    const VkPipelineStageFlags sourceStage =
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    const VkPipelineStageFlags destinationStage =
+        VK_PIPELINE_STAGE_TRANSFER_BIT;
 
     barrier.srcAccessMask = 0;
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;

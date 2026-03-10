@@ -1,4 +1,6 @@
 #include "Args.h"
+#include <cstring>
+#include <vector>
 
 namespace BR {
 
@@ -18,7 +20,7 @@ static StringType getStringType(const char *str) {
 
 static const Switch *getSwitch(const char *str,
                                const std::vector<Switch> &switches) {
-    StringType type = getStringType(str);
+    const StringType type = getStringType(str);
 
     if (type == StringType::LONGNAME) {
         for (const Switch &sw : switches) {
@@ -70,7 +72,7 @@ std::vector<Option> getOptions(int argc, const char *argv[],
 
         // Get Argument for option
         while (argc) {
-            StringType type = getStringType(argv[0]);
+            const StringType type = getStringType(argv[0]);
             if (type != StringType::VALUE) {
                 break;
             }

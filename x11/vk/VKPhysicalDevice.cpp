@@ -1,11 +1,12 @@
 #include "VKPhysicalDevice.h"
 
-#include <set>
-#include <string>
+#include <cstdint>
+#include <cstdio>
 #include <vector>
 
 #include "VKUtil.h"
 #include <string.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -37,7 +38,7 @@ bool VulkanPhysicalDevice::isDeviceSuitable(VkSurfaceKHR surface) {
     if (checkSwapchainExtensionSupport(physicalDevice) == false)
         return false;
 
-    SwapChainSupportDetails swapChainSupport(physicalDevice, surface);
+    const SwapChainSupportDetails swapChainSupport(physicalDevice, surface);
     if (swapChainSupport.formats.empty() ||
         swapChainSupport.presentModes.empty())
         return false;

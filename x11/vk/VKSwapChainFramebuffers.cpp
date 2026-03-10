@@ -1,4 +1,11 @@
 #include "VKSwapChainFramebuffers.h"
+#include "vk/VKFramebuffer.h"
+#include "vk/VKImageView.h"
+#include "vk/VKSwapChain.h"
+#include <array>
+#include <cstdint>
+#include <memory>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

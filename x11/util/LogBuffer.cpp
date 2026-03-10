@@ -1,10 +1,13 @@
 #include "LogBuffer.h"
+#include "util/Core.h"
+#include "util/LineColor.h"
 
+#include <cstdint>
 #include <string.h>
 
 namespace BR {
 size_t LogBuffer::add(const char *ln) {
-    size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
+    const size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
 
     LineColor<80> newLine;
     newLine << FormatString{ln, 0};
@@ -18,7 +21,7 @@ size_t LogBuffer::add(const char *ln) {
 }
 
 size_t LogBuffer::add(const LineColor<80> &lineColor) {
-    size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
+    const size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
 
     lines[next] = lineColor;
     cur = next;

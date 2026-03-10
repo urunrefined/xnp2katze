@@ -2,11 +2,13 @@
 
 #include <array>
 
+#include <cstdint>
 #include <stdio.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
-VulkanRenderPass::VulkanRenderPass(const VkDevice device, VkFormat colorFormat,
+VulkanRenderPass::VulkanRenderPass(VkDevice device, VkFormat colorFormat,
                                    VkFormat depthFormat, ShouldPresent present)
     : device(device) {
     VkAttachmentDescription colorAttachment = {};

@@ -1,11 +1,13 @@
 #include "VKGLFW.h"
 #include "Input.h"
+#include "util/Rect.h"
 
+#include <GLFW/glfw3.h>
 #include <assert.h>
+#include <cstdint>
+#include <cstdio>
 #include <math.h>
-#include <signal.h>
-#include <string.h>
-#include <unistd.h>
+#include <vector>
 
 namespace BR {
 
@@ -160,7 +162,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
     if (action == GLFW_PRESS) {
 
-        for (KeyMapping &keyPair : keymap) {
+        for (const KeyMapping &keyPair : keymap) {
             if (keyPair.glfwKey == key) {
                 input.pressKey(keyPair.inputKey);
                 break;
@@ -196,7 +198,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
         }
 
     } else if (action == GLFW_RELEASE) {
-        for (KeyMapping &keyPair : keymap) {
+        for (const KeyMapping &keyPair : keymap) {
             if (keyPair.glfwKey == key) {
                 input.letgoKey(keyPair.inputKey);
                 break;
@@ -214,7 +216,7 @@ static void mouse_move_callback(GLFWwindow *window, double x, double y) {
     GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
-    input.moveMouse(x, y);
+    input.moveMouse((float)x, (float)y);
 
     // printf("update mouse raw %u %u\n", ix, iy);
 
@@ -231,14 +233,14 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action,
     if (isFocused) {
 
         if (action == GLFW_PRESS) {
-            for (MouseMapping &buttonPair : mousemap) {
+            for (const MouseMapping &buttonPair : mousemap) {
                 if (buttonPair.glfwKey == button) {
                     input.pressButton(buttonPair.inputKey);
                     break;
                 }
             }
         } else if (action == GLFW_RELEASE) {
-            for (MouseMapping &buttonPair : mousemap) {
+            for (const MouseMapping &buttonPair : mousemap) {
                 if (buttonPair.glfwKey == button) {
                     input.letgoButton(buttonPair.inputKey);
                     break;

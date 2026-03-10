@@ -4,14 +4,19 @@
 #include "VKSync.h"
 
 #include "util/Range.h"
+#include "vk/VKCommandBuffer.h"
+#include "vk/VKCommandPool.h"
+#include "vk/VKTexture.h"
 
 #include <assert.h>
 
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
 #include <stdio.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -67,7 +72,7 @@ void drawAndWait(VkDevice device, VulkanCommandBuffer &renderBuffer,
 
     VulkanSemaphore renderFinishedSemaphore(device);
     VulkanSemaphore vboUpdatedSemaphore(device);
-    VulkanSemaphore imageFinishedSemaphore(device);
+    const VulkanSemaphore imageFinishedSemaphore(device);
 
     Sitter queueSitter(device);
 
@@ -85,7 +90,7 @@ void drawAndWait(VkDevice device, VulkanCommandBuffer &renderBuffer,
     (*commandBuffer).end();
 
     VkSubmitInfo submitInfo[2] = {};
-    VkPipelineStageFlags flagsWaitForImage =
+    const VkPipelineStageFlags flagsWaitForImage =
         VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     {
@@ -103,7 +108,8 @@ void drawAndWait(VkDevice device, VulkanCommandBuffer &renderBuffer,
         updateSubmitInfo.pSignalSemaphores = vboUpdatedSemaphore;
     }
 
-    VkPipelineStageFlags flagsWaitForVBOUpdate = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    const VkPipelineStageFlags flagsWaitForVBOUpdate =
+        VK_PIPELINE_STAGE_TRANSFER_BIT;
 
     {
         VkSubmitInfo &drawSubmitInfo = submitInfo[1];

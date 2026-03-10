@@ -1,4 +1,9 @@
 #include "VKPipelineV.h"
+#include "vk/VKRenderOptions.h"
+#include "vk/VKShaders.h"
+#include <cstddef>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

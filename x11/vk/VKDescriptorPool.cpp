@@ -1,4 +1,6 @@
 #include "VKDescriptorPool.h"
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

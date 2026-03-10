@@ -53,7 +53,7 @@ class DataAllocator {
     DataAllocator(VulkanVtxBuffer &buffer_) : buffer(buffer_), currentByte(0) {}
 
     Segment2f get2fSegment(size_t elementCount) {
-        size_t toAllocate = elementCount * 2 * sizeof(float);
+        const size_t toAllocate = elementCount * 2 * sizeof(float);
 
         Segment2f segment{&buffer, currentByte, elementCount};
 
@@ -63,7 +63,7 @@ class DataAllocator {
     }
 
     Segment3f get3fSegment(size_t elementCount) {
-        size_t toAllocate = elementCount * 3 * sizeof(float);
+        const size_t toAllocate = elementCount * 3 * sizeof(float);
 
         Segment3f segment{&buffer, currentByte, elementCount};
 
@@ -73,7 +73,7 @@ class DataAllocator {
     }
 
     Segment4f get4fSegment(size_t elementCount) {
-        size_t toAllocate = elementCount * 4 * sizeof(float);
+        const size_t toAllocate = elementCount * 4 * sizeof(float);
 
         Segment4f segment{&buffer, currentByte, elementCount};
 
@@ -105,7 +105,7 @@ class UniformAllocator {
 
     UniformChunk getChunk(size_t alignment, size_t size) {
 
-        size_t nextStep = currentByte % alignment;
+        const size_t nextStep = currentByte % alignment;
 
         currentByte += nextStep;
 

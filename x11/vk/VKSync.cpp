@@ -1,6 +1,8 @@
 #include "VKSync.h"
 #include <assert.h>
+#include <cstdint>
 #include <stdio.h>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -19,7 +21,7 @@ VulkanSemaphore::~VulkanSemaphore() {
 }
 
 VulkanFence::VulkanFence(VkDevice device) : device(device) {
-    VkFenceCreateInfo fenceCreateInfo = {
+    const VkFenceCreateInfo fenceCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0};
@@ -39,7 +41,7 @@ VkResult VulkanFence::wait() {
 Sitter::Sitter(VkDevice device) : device(device) {
     assert(state == SitterState::INACTIVE);
 
-    VkFenceCreateInfo fenceCreateInfo = {
+    const VkFenceCreateInfo fenceCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0};
@@ -65,7 +67,8 @@ bool Sitter::done() { return state == SitterState::INACTIVE; }
 void Sitter::block(uint64_t nanoseconds) {
     assert(state == SitterState::ACTIVE);
 
-    VkResult result = vkWaitForFences(device, 1, &fence, VK_FALSE, nanoseconds);
+    const VkResult result =
+        vkWaitForFences(device, 1, &fence, VK_FALSE, nanoseconds);
 
     if (result == VK_SUCCESS) {
         vkResetFences(device, 1, &fence);
@@ -82,7 +85,8 @@ void Sitter::block(uint64_t nanoseconds) {
 void Sitter::block() {
     assert(state == SitterState::ACTIVE);
 
-    VkResult result = vkWaitForFences(device, 1, &fence, VK_FALSE, UINT64_MAX);
+    const VkResult result =
+        vkWaitForFences(device, 1, &fence, VK_FALSE, UINT64_MAX);
 
     assert(result != VK_TIMEOUT);
 
@@ -99,7 +103,7 @@ void Sitter::block() {
 void Sitter::wait() {
     assert(state == SitterState::ACTIVE);
 
-    VkResult result = vkWaitForFences(device, 1, &fence, VK_FALSE, 0);
+    const VkResult result = vkWaitForFences(device, 1, &fence, VK_FALSE, 0);
 
     if (result == VK_SUCCESS) {
         vkResetFences(device, 1, &fence);

@@ -1,9 +1,13 @@
 #include "VKDescriptorSetExt.h"
 #include "util/Core.h"
 #include "util/Matrix4x4.h"
+#include "vk/VKDescriptorBuffer.h"
+#include "vk/VKPhysicalDevice.h"
 
+#include <cstdint>
 #include <string.h>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 
@@ -47,7 +51,7 @@ VulkanDescriptorLayoutExt::~VulkanDescriptorLayoutExt() {
 
 template <class T1>
 static VkDeviceSize getUniformSize(const VulkanPhysicalDevice &physicalDevice) {
-    VkDeviceSize alignment =
+    const VkDeviceSize alignment =
         physicalDevice.getMinUniformBufferOffsetAlignment();
 
     if (sizeof(T1) % alignment) {

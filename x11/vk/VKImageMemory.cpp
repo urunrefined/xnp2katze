@@ -1,5 +1,6 @@
 #include "VKImageMemory.h"
 #include "vk/VKUtil.h"
+#include <vulkan/vulkan_core.h>
 
 namespace BR {
 

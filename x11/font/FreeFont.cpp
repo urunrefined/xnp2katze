@@ -1,40 +1,54 @@
 
 #include "FreeFont.h"
 #include "Fontconfig.h"
+#include "font/Freetype.h"
+#include "font/Harfbuzz.h"
+#include "util/Image.h"
+#include "util/Vertex.h"
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <freetype/freetype.h>
+#include <freetype/ftimage.h>
+#include <freetype/fttypes.h>
+#include <hb.h>
+#include <string>
+#include <vector>
 
 namespace BR {
 
-static void draw_bitmapAlpha(FT_Bitmap *bitmap, Image8 &image, int xOffset,
-                             int yOffset, unsigned int pxSize, int leftOffset) {
+static void draw_bitmapAlpha(FT_Bitmap *bitmap, Image8 &image, uint32_t xOffset,
+                             uint32_t yOffset, unsigned int pxSize,
+                             int leftOffset) {
     if (!bitmap->rows)
         return;
 
-    char *data = image.data;
+    uint8_t *data = image.data;
 
     // bitmap->rows /width could theoretically be larger than pxSize, so cut it
     // off here
 
-    unsigned int rows = std::min(pxSize, bitmap->rows);
-    unsigned int width = std::min(pxSize, bitmap->width);
+    const unsigned int rows = std::min(pxSize, bitmap->rows);
+    const unsigned int width = std::min(pxSize, bitmap->width);
 
     for (unsigned int y = 0; y < rows; y++) {
-        size_t row = (y + yOffset) * image.width;
+        const size_t row = ((size_t)y + yOffset) * image.width;
 
         for (unsigned int x = 0; x < width; x++) {
 
             if (leftOffset + x > pxSize)
                 continue;
 
-            unsigned int col = xOffset + x;
+            const unsigned int col = xOffset + x;
 
-            size_t idx = row + col + leftOffset;
+            const size_t idx = row + col + leftOffset;
 
             if (idx >= image.byteSize())
                 continue;
 
-            uint8_t px =
+            const uint8_t px =
                 bitmap->buffer[bitmap->width * (bitmap->rows - 1 - y) + (x)];
             data[idx] |= px;
         }
@@ -53,10 +67,10 @@ static void get2DSquareBox(float startX, float startY, float wh,
                            std::vector<Vec2> &ret) {
     // clang-format off
 
-  Vec2 lu {float(startX)       , float(startY + wh)};
-  Vec2 lb {float(startX)       , float(startY)     };
-  Vec2 ru {float(startX + (wh )), float(startY + wh)};
-  Vec2 rb {float(startX + (wh )), float(startY)     };
+  Vec2 const lu {float(startX)       , float(startY + wh)};
+  Vec2 const lb {float(startX)       , float(startY)     };
+  Vec2 const ru {float(startX + (wh )), float(startY + wh)};
+  Vec2 const rb {float(startX + (wh )), float(startY)     };
 
     // clang-format on
 
@@ -75,10 +89,10 @@ static void getUVs(std::vector<Vec2> &uvs, float x, float y, float xSize,
   
 //  printf("--------- x %f, y %f, xSize %f, ySize %f\n", x, y, xSize, ySize);
 
-  Vec2 lb { x                 / imageWidth,  y           / imageHeight };
-  Vec2 lu { x                 / imageWidth, (y + ySize - 0.5f)  / imageHeight };
-  Vec2 rb {(x + xSize - 0.5f) / imageWidth,  y           / imageHeight };
-  Vec2 ru {(x + xSize - 0.5f) / imageWidth, (y + ySize - 0.5f)  / imageHeight };
+  Vec2 const lb { x                 / imageWidth,  y           / imageHeight };
+  Vec2 const lu { x                 / imageWidth, (y + ySize - 0.5f)  / imageHeight };
+  Vec2 const rb {(x + xSize - 0.5f) / imageWidth,  y           / imageHeight };
+  Vec2 const ru {(x + xSize - 0.5f) / imageWidth, (y + ySize - 0.5f)  / imageHeight };
 
   /*
   printf("lb %f %f\n", lb.x, lb.y);
@@ -102,14 +116,16 @@ void mappingsToGlData(unsigned int pxSize, std::vector<ImageGlyph> &imageGlyphs,
                       std::vector<Vec2> &vtxs, std::vector<Vec2> &uvs) {
 
     for (const auto &imageGlyph : imageGlyphs) {
-        int glyphsPerLine = imageGlyph.image.width / pxSize;
+        const uint16_t glyphsPerLine = imageGlyph.image.width / pxSize;
 
-        int wSlot = imageGlyph.idx % glyphsPerLine;
-        int hSlot = imageGlyph.idx / glyphsPerLine;
+        const uint32_t wSlot = imageGlyph.idx % glyphsPerLine;
+        const uint32_t hSlot = imageGlyph.idx / glyphsPerLine;
 
         get2DSquareBox(imageGlyph.offsetX, imageGlyph.offsetY, 1, vtxs);
-        getUVs(uvs, wSlot * pxSize, hSlot * pxSize, pxSize, pxSize,
-               imageGlyph.image.width, imageGlyph.image.height);
+
+        getUVs(uvs, (float)(wSlot * pxSize), (float)(hSlot * pxSize),
+               (float)pxSize, (float)pxSize, (float)imageGlyph.image.width,
+               (float)imageGlyph.image.height);
     }
 }
 
@@ -126,7 +142,7 @@ std::vector<ImageGlyph> getTextMappings(ImageIndexed8 &image,
     float penY = 0;
 
     for (unsigned int n = 0; n < text.getGlyphCount(); n++) {
-        hb_codepoint_t codepoint = text.getGlyph(n);
+        const hb_codepoint_t codepoint = text.getGlyph(n);
 
         //    printf("offsetX %d, offsetY: %d\n", text.getOffsetX(n),
         //    text.getOffsetY(n));
@@ -134,15 +150,15 @@ std::vector<ImageGlyph> getTextMappings(ImageIndexed8 &image,
         auto gl = std::find(glyphCache.begin(), glyphCache.end(), codepoint);
 
         if (gl == glyphCache.end()) {
-            int glyphsPerLine = image.image.width / face.pxSize;
+            const uint16_t glyphsPerLine = image.image.width / face.pxSize;
 
-            int wslot = image.idx % glyphsPerLine;
-            int hslot = image.idx / glyphsPerLine;
+            const uint32_t wslot = image.idx % glyphsPerLine;
+            const uint32_t hslot = image.idx / glyphsPerLine;
 
             //      printf("New Glyph on slot %d %d, idx %d\n", wslot, hslot,
             //      image.idx);
 
-            FT_Error error =
+            const FT_Error error =
                 FT_Load_Glyph(face.face, codepoint, FT_LOAD_RENDER);
 
             if (error) {
@@ -184,8 +200,8 @@ std::vector<ImageGlyph> getTextMappings(ImageIndexed8 &image,
                                metrics.horiBearingY, metrics.horiBearingY / 64);
                 */
 
-                float descender =
-                    (float)(metrics.height - metrics.horiBearingY) / 64.0 /
+                const float descender =
+                    (float)(metrics.height - metrics.horiBearingY) / 64.0f /
                     (float)face.pxSize;
 
                 draw_bitmapAlpha(&slot->bitmap, image.image,
@@ -218,8 +234,8 @@ std::vector<ImageGlyph> getTextMappings(ImageIndexed8 &image,
                 toImageGlyph(penX, penY - gl->descender, gl->idx, image.image));
         }
 
-        penX += ((float)text.getAdvanceX(n)) / 64.0 / (float)face.pxSize;
-        penY += ((float)text.getAdvanceY(n)) / 64.0 / (float)face.pxSize;
+        penX += ((float)text.getAdvanceX(n)) / 64.0f / (float)face.pxSize;
+        penY += ((float)text.getAdvanceY(n)) / 64.0f / (float)face.pxSize;
     }
 
     return textGlyphs;

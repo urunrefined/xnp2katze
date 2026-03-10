@@ -1,5 +1,9 @@
 #include "Vertex.h"
+#include <iomanip>
+#include <iostream>
 #include <math.h>
+#include <ostream>
+#include <vector>
 
 namespace BR {
 
@@ -29,8 +33,8 @@ void Vec2::print() const {
 float Vec2::getLength() const { return (float)sqrt(x * x + y * y); }
 
 Vec2 &Vec2::normalize() {
-    float length = getLength();
-    if (length) {
+    const float length = getLength();
+    if (length > 0.00001) {
         x /= length;
         y /= length;
     }
@@ -102,7 +106,7 @@ Vec3 Vec3::cross(const Vec3 &vec) const {
 }
 
 Vec3 &Vec3::normalize() {
-    float length = getLength();
+    const float length = getLength();
     if (length != 0.0f) {
         x /= length;
         y /= length;
