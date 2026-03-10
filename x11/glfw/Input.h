@@ -169,6 +169,7 @@ class Input {
 
   public:
     std::vector<KeyEvent> keyEvents;
+    std::vector<uint32_t> codepoints;
 
     float mouse_x = 0;
     float mouse_y = 0;

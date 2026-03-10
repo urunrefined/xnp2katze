@@ -21,13 +21,6 @@ class GLFWInput : public Input {
         }
     };
 
-    std::vector<uint32_t> codepoints;
-
-    void reset() {
-        codepoints.clear();
-        Input::reset();
-    }
-
     GLFWInput() : window(nullptr), shouldClose(false) {}
     virtual ~GLFWInput() {}
 };

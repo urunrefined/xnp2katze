@@ -208,6 +208,8 @@ SRC_CPP = \
 		x11/pccorecallbacks.cpp                        \
 		x11/inputhandling.cpp                          \
 		x11/soundmng.cpp                               \
+		x11/PicContext.cpp                             \
+		x11/ConsoleContext.cpp                         \
 		x11/pulse/PulseSoundEngine.cpp                 \
 		x11/pulse/Thread.cpp                           \
 		x11/misc/threadbase.cpp                        \

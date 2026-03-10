@@ -109,6 +109,8 @@ class MainContext {
 
     virtual void frame() = 0;
 
+    Input &getInput() { return windowContext->glfwSurface.input; }
+
     void reset() {
         GLFWInput &input = windowContext->glfwSurface.input;
         input.reset();

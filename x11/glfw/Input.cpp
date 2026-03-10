@@ -39,7 +39,10 @@ bool Input::getButton(MouseButtons key) const {
     return mouseButtons[(size_t)key].pressed;
 };
 
-void Input::reset() { keyEvents.clear(); }
+void Input::reset() {
+    keyEvents.clear();
+    codepoints.clear();
+}
 
 void Input::moveMouse(float x, float y) {
     mouse_x += x * 0.1;
