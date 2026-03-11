@@ -55,9 +55,15 @@ void PicContext::createRender(VulkanRenderPass &renderPass,
 }
 
 void PicContext::work() {
-    inputMapper.handleInput(getInput(), viewPortMode, visualScreen, doubleLines,
-                            soundEngine);
-    inputMapper.handleInputKeys(getInput());
+    Input& input = getInput();
+
+    if(input.getButton(KeyButtons::KEY_SUPER)){
+        inputMapper.handleSpecialInput(input, viewPortMode, visualScreen, doubleLines,
+            soundEngine);
+    }
+    else{
+        inputMapper.handleInputKeys(input);
+    }
 
     LockGuard lock(globalMutex);
     mainloop(&ctx, &soundEngine);

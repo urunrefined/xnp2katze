@@ -449,7 +449,7 @@ template <class T1> T1 next(const T1 &t1) {
     return (T1)((((int)t1) + 1) % (int)T1::END);
 }
 
-bool InputMapper::handleInput(Input &input, ViewPortMode &viewPortMode,
+bool InputMapper::handleSpecialInput(Input &input, ViewPortMode &viewPortMode,
                               VisualScreen &visualScreen,
                               DoubleLines &doubleLine,
                               Sfx::PulseSoundEngine &soundRef) {

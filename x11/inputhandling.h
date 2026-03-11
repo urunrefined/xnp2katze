@@ -18,7 +18,7 @@ class InputMapper {
 
   public:
     InputMapper(std::vector<KeyMappingNew> mapping_) : mapping(mapping_) {}
-    bool handleInput(Input &input, ViewPortMode &viewPortMode,
+    bool handleSpecialInput(Input &input, ViewPortMode &viewPortMode,
                      VisualScreen &visualScreen, DoubleLines &doubleLines,
                      Sfx::PulseSoundEngine &soundRef);
 
