@@ -40,7 +40,7 @@ static std::vector<char> readShaderFile(const char *filename) {
         return readFile(shaderFilename);
     } catch (...) {
         const std::string shaderFilename(std::string("/usr/share/xnp2katze/") +
-                                   filename);
+                                         filename);
         printf("Try global shaderfilename: %s\n", shaderFilename.c_str());
         return readFile(shaderFilename);
     }

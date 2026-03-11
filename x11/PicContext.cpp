@@ -12,7 +12,7 @@ PicContext::PicContext(VulkanDevice &device,
                        std::unique_ptr<VulkanWindowContext> &&windowContext_,
                        VulkanSampler &sampler, VulkanDescriptorLayouts &layouts,
                        Sfx::PulseSoundEngine &soundEngine,
-                       InputMapper &inputMapper)
+                       InputMapper &inputMapper, Mutex &globalMutex)
     : MainContext(device, physicalDevice, std::move(windowContext_)),
       uniformBuffer(device, physicalDevice, 2 * 1024 * 1024), ua(uniformBuffer),
       mainTexture(device, physicalDevice, pc98Width, pc98Height),
@@ -23,7 +23,8 @@ PicContext::PicContext(VulkanDevice &device,
       ctx{{pc98Width, pc98Height, img.data()},
           &windowContext->glfwSurface.input,
           false},
-      soundEngine(soundEngine), inputMapper(inputMapper)
+      soundEngine(soundEngine), inputMapper(inputMapper),
+      globalMutex(globalMutex)
 
 {
     fill(mainTexture, {000, 000, 000, 0});
@@ -58,6 +59,7 @@ void PicContext::work() {
                             soundEngine);
     inputMapper.handleInputKeys(getInput());
 
+    LockGuard lock(globalMutex);
     mainloop(&ctx, &soundEngine);
 }
 

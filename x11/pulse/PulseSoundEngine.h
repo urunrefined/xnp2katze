@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "Thread.h"
+#include "util/Thread.h"
 #include <pulse/pulseaudio.h>
 #include <string.h>
 

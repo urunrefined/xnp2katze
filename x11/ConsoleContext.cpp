@@ -130,7 +130,8 @@ static void listConfig(GLConsole &console, const NP2OSCFG &oscfg) {
 
 static void processConsoleCommand(const std::string &line, GLConsole &console,
                                   const NP2OSCFG &oscfg,
-                                  const std::string &diskDir) {
+                                  const std::string &diskDir,
+                                  Mutex &globalMutex) {
 
     auto tokens = split(line.c_str());
 
@@ -172,6 +173,8 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
                 std::string diskPath(diskDir + "/" + listing.filenames[diskno]);
 
                 list(console, "Load", listing.filenames[diskno].c_str(), 0);
+
+                LockGuard lg(globalMutex);
                 diskdrv_readyfdd(diskno, diskPath.c_str(), 0);
             }
 
@@ -186,6 +189,7 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
             std::string diskName(tokens.views[1].str, tokens.views[1].sz);
             std::string diskPath = diskDir + "/" + diskName;
 
+            LockGuard lg(globalMutex);
             diskdrv_readyfdd(diskno, diskPath.c_str(), 0);
         }
     }
@@ -195,7 +199,7 @@ ConsoleContext::ConsoleContext(
     VulkanDevice &device, VulkanPhysicalDevice &physicalDevice,
     std::unique_ptr<VulkanWindowContext> &&windowContext_,
     VulkanSampler &sampler, VulkanDescriptorLayouts &layouts,
-    const std::string &diskDir, const NP2OSCFG &oscfg)
+    const std::string &diskDir, const NP2OSCFG &oscfg, Mutex &globalMutex)
     : MainContext(device, physicalDevice, std::move(windowContext_)),
       uniformBuffer(device, physicalDevice, 2 * 1024 * 1024), ua(uniformBuffer),
       glyphCache(physicalDevice, device),
@@ -205,7 +209,7 @@ ConsoleContext::ConsoleContext(
                   font.freetypeFace, font.hbfont},
       console(alc, fontContext, 80, device, physicalDevice, ua, sampler,
               layouts, glyphCache.alphaTexture.textureView),
-      diskDir(diskDir), oscfg(oscfg)
+      diskDir(diskDir), oscfg(oscfg), globalMutex(globalMutex)
 
 {
     cmbBuffers.push_back(&vtx);
@@ -249,7 +253,8 @@ void ConsoleContext::work() {
             auto utf8 = getUTF8FromUnicode(console.codePoints);
 
             if (utf8) {
-                processConsoleCommand(*utf8, console, oscfg, diskDir);
+                processConsoleCommand(*utf8, console, oscfg, diskDir,
+                                      globalMutex);
             }
 
             console.clear();

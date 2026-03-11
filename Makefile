@@ -211,7 +211,6 @@ SRC_CPP = \
 		x11/PicContext.cpp                             \
 		x11/ConsoleContext.cpp                         \
 		x11/pulse/PulseSoundEngine.cpp                 \
-		x11/pulse/Thread.cpp                           \
 		x11/misc/threadbase.cpp                        \
 		x11/misc/tty.cpp                               \
 		x11/misc/usbdev.cpp                            \
@@ -282,7 +281,8 @@ SRC_CPP = \
 		x11/font/Fontconfig.cpp                        \
 		x11/font/FreeFont.cpp                          \
 		x11/font/Harfbuzz.cpp                          \
-		x11/font/Freetype.cpp
+		x11/font/Freetype.cpp                          \
+		x11/util/Thread.cpp
 
 		
 

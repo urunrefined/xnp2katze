@@ -15,6 +15,7 @@
 #include "inputhandling.h"
 #include "pccorecallbacks.h"
 #include "pulse/PulseSoundEngine.h"
+#include "util/Thread.h"
 
 namespace BR {
 
@@ -35,11 +36,14 @@ class PicContext : public MainContext {
     DoubleLines doubleLines = DoubleLines::NO;
     ViewPortMode viewPortMode = ViewPortMode::INTEGER;
 
+    Mutex &globalMutex;
+
   public:
     PicContext(VulkanDevice &device, VulkanPhysicalDevice &physicalDevice,
                std::unique_ptr<VulkanWindowContext> &&windowContext_,
                VulkanSampler &sampler, VulkanDescriptorLayouts &layouts,
-               Sfx::PulseSoundEngine &soundEngine, InputMapper &inputMapper);
+               Sfx::PulseSoundEngine &soundEngine, InputMapper &inputMapper,
+               Mutex &globalMutex);
 
     virtual void createRender(VulkanRenderPass &renderPass,
                               VkFormat renderDepthFormat,

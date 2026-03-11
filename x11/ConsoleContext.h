@@ -43,11 +43,14 @@ class ConsoleContext : public MainContext {
     const std::string &diskDir;
     const NP2OSCFG &oscfg;
 
+    Mutex &globalMutex;
+
   public:
     ConsoleContext(VulkanDevice &device, VulkanPhysicalDevice &physicalDevice,
                    std::unique_ptr<VulkanWindowContext> &&windowContext_,
                    VulkanSampler &sampler, VulkanDescriptorLayouts &layouts,
-                   const std::string &diskDir, const NP2OSCFG &oscfg);
+                   const std::string &diskDir, const NP2OSCFG &oscfg,
+                   Mutex &globalMutex);
 
     virtual void createRender(VulkanRenderPass &renderPass,
                               VkFormat renderDepthFormat,

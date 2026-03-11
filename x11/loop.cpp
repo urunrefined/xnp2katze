@@ -25,6 +25,7 @@
 #include "util/Codepage.h"
 #include "util/FileListing.h"
 #include "util/StringView.h"
+#include "util/Thread.h"
 
 #include "ConsoleContext.h"
 #include "PicContext.h"
@@ -101,9 +102,11 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     std::vector<std::unique_ptr<MainContext>> contexts;
 
+    Mutex globalMutex;
+
     contexts.emplace_back(std::make_unique<PicContext>(
         device, physicalDevice, std::move(firstWindow), sampler, layouts,
-        soundEngine, inputMapper));
+        soundEngine, inputMapper, globalMutex));
 
     MainContext &context = *contexts.back();
 
@@ -123,7 +126,7 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
 
     contexts.emplace_back(std::make_unique<ConsoleContext>(
         device, physicalDevice, std::move(secondWindow), sampler, layouts,
-        diskDir, oscfg));
+        diskDir, oscfg, globalMutex));
 
     while (!shouldWindowsClose(contexts) && !sfd.isTriggered()) {
         glfwContext.pollWindowEvents();
