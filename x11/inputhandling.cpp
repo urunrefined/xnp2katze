@@ -450,9 +450,9 @@ template <class T1> T1 next(const T1 &t1) {
 }
 
 bool InputMapper::handleSpecialInput(Input &input, ViewPortMode &viewPortMode,
-                              VisualScreen &visualScreen,
-                              DoubleLines &doubleLine,
-                              Sfx::PulseSoundEngine &soundRef) {
+                                     VisualScreen &visualScreen,
+                                     DoubleLines &doubleLine,
+                                     Sfx::PulseSoundEngine &soundRef) {
 
     bool changed = false;
 

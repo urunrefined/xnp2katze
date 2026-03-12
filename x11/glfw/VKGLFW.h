@@ -54,7 +54,7 @@ class GLFWSurface {
 
     GLFWwindow *window;
 
-    GLFWSurface(uint32_t width_, uint32_t height_);
+    GLFWSurface(uint32_t width_, uint32_t height_, const char *windowName);
     ~GLFWSurface();
 
     GLFWInput input;

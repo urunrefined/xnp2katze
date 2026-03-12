@@ -285,13 +285,13 @@ GLFWContext::GLFWContext() {
 
 GLFWContext::~GLFWContext() { glfwTerminate(); }
 
-GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight)
+GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight, const char *windowName)
     : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
 
     assert((int)surfaceHeight > 0);
     assert((int)surfaceWidth > 0);
 
-    window = glfwCreateWindow((int)surfaceWidth, (int)surfaceHeight, "Vulkan",
+    window = glfwCreateWindow((int)surfaceWidth, (int)surfaceHeight, windowName,
                               nullptr, nullptr);
 
     if (!window) {

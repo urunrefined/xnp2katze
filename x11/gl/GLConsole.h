@@ -25,7 +25,7 @@ class GLConsole {
     GLTextColors commandLine;
     Palette8f palette;
 
-    ArrayNTOs<GLTextColors, 32> visibleLines;
+    ArrayNTOs<GLTextColors, 64> visibleLines;
 
     std::vector<uint32_t> codePoints;
     FontContext &fontContext;

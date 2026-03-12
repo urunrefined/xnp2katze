@@ -128,6 +128,14 @@ static void listConfig(GLConsole &console, const NP2OSCFG &oscfg) {
     list(console, "", "");
 }
 
+static void printHelp(GLConsole &console) {
+    listSep(console, " --- ", "Help");
+
+    list(console, "showosconfig", "Shows the current OS config");
+    list(console, "dumpmem <offset> <size>",
+         "Prints memory from offset <offset> for <size> bytes");
+}
+
 static void processConsoleCommand(const std::string &line, GLConsole &console,
                                   const NP2OSCFG &oscfg,
                                   const std::string &diskDir,
@@ -138,7 +146,12 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
     if (!tokens.count)
         return;
 
+    if (tokens.views[0] == "help" || tokens.views[0] == "?") {
+        printHelp(console);
+    }
+
     if (tokens.views[0] == "showosconfig") {
+
         listConfig(console, oscfg);
     }
 

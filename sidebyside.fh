@@ -1,0 +1,50 @@
+#!/bin/fish
+
+echo "--- $argv ---"
+
+./xnp2 $argv &
+
+set retries 10
+
+while [ $retries -gt 0 ]
+	set retries $(math "$retries - 1")
+	sleep 1
+
+	set windowMain $(xdotool search -name XNP2Katze-main)
+	set windowConsole $(xdotool search -name XNP2Katze-console)
+
+	if [ -n "$windowMain" ]
+		if [ -n "$windowConsole" ]
+			break;
+		end
+	end
+end
+
+if [ $retries -eq 0 ]
+	echo "Could not find windows"
+	exit 1
+end
+
+set windowMain $(xdotool search -name XNP2Katze-main)
+set windowConsole $(xdotool search -name XNP2Katze-console)
+
+echo "windowMain: $windowMain; windowConsole: $windowConsole"
+
+set screenSizeX 3840
+set screenSizeY 2160
+
+set halfScreenSizeX $(math "$screenSizeX / 2")
+
+xdotool windowmove $windowMain 0 0
+xdotool windowsize $windowMain $halfScreenSizeX $screenSizeY
+
+xdotool windowmove $windowConsole $halfScreenSizeX 0
+xdotool windowsize $windowConsole $halfScreenSizeX $screenSizeY
+
+xdotool windowraise $windowMain
+xdotool windowraise $windowConsole
+
+xdotool windowmap $windowMain
+xdotool windowmap $windowConsole
+
+wait
