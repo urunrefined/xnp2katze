@@ -48,7 +48,7 @@ class GLConsole {
     void clear();
 
     void addLine(const std::string &line);
-    void addLine(const LineColor<80> &lineColor);
+    void addLine(const LineColor<132> &lineColor);
 
     void draw(PipelineTexExtIyColor &pipeline, VkCommandBuffer *commandBuffers,
               size_t bufferCount) {

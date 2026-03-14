@@ -5,6 +5,7 @@
 #include "fdd/diskdrv.h"
 #include "util/Codepage.h"
 #include "util/FileListing.h"
+#include "util/Number.h"
 #include "util/StringView.h"
 
 #include "gl/GLConsole.h"
@@ -16,16 +17,16 @@ namespace BR {
 
 static void list(GLConsole &console, const char *str, UINT32 val,
                  UINT32 offset = 0) {
-    LineColor<80> lineColor;
+    LineColor<132> lineColor;
 
-    lineColor << FormatString{str, 0} << FormatPad{24 + offset, 0}
+    lineColor << FormatString{str, 0} << FormatPad{36 + offset, 0}
               << FormatSize{val, 2};
 
     console.addLine(lineColor);
 }
 
 static void listIdx(GLConsole &console, size_t idx, const char *str) {
-    LineColor<80> lineColor;
+    LineColor<132> lineColor;
 
     lineColor << FormatSize{idx, 0} << FormatString{": ", 2} << FormatPad{8, 0}
               << FormatString{str, 0};
@@ -34,7 +35,7 @@ static void listIdx(GLConsole &console, size_t idx, const char *str) {
 }
 
 static void listSep(GLConsole &console, const char *sentinel, const char *str) {
-    LineColor<80> lineColor;
+    LineColor<132> lineColor;
 
     lineColor << FormatString{sentinel, 0} << FormatString{str, 1}
               << FormatString{sentinel, 0};
@@ -44,8 +45,8 @@ static void listSep(GLConsole &console, const char *sentinel, const char *str) {
 
 static void list(GLConsole &console, const char *str, const char *val,
                  UINT32 offset = 0) {
-    LineColor<80> lineColor;
-    lineColor << FormatString{str, 0} << FormatPad{24 + offset, 0}
+    LineColor<132> lineColor;
+    lineColor << FormatString{str, 0} << FormatPad{36 + offset, 0}
               << FormatString{val, 2};
 
     console.addLine(lineColor);
@@ -59,7 +60,7 @@ static void listComConfig(GLConsole &console, const COMCFG &cfg) {
 
 static void printHex(GLConsole &console, size_t offset, size_t sz,
                      const uint8_t *data) {
-    LineColor<80> lineColor;
+    LineColor<132> lineColor;
 
     lineColor << FormatHex16{(uint16_t)offset, 1};
     lineColor << FormatString{":  ", 2};
@@ -67,6 +68,19 @@ static void printHex(GLConsole &console, size_t offset, size_t sz,
     for (size_t i = offset; i < offset + sz; i++) {
         lineColor << FormatHex{data[i], 1};
         lineColor << FormatString{" ", 0};
+    }
+    
+    lineColor << FormatString{"  ", 0};
+    
+    for (size_t i = offset; i < offset + sz; i++) {
+        uint8_t ch = data[i];
+    
+        if (isprint(ch)) {
+            lineColor << FormatPrintChar{ch, 0};
+        }
+        else {
+            lineColor << FormatPrintChar{'.', 0};
+        }
     }
 
     console.addLine(lineColor);
@@ -83,6 +97,8 @@ static void cHexdumpMainmem(GLConsole &console, size_t offset, size_t size) {
 
         printHex(console, i, prln, (uint8_t *)mem);
     }
+
+    listSep(console, "", "");
 }
 
 static void listConfig(GLConsole &console, const NP2OSCFG &oscfg) {
@@ -131,9 +147,17 @@ static void listConfig(GLConsole &console, const NP2OSCFG &oscfg) {
 static void printHelp(GLConsole &console) {
     listSep(console, " --- ", "Help");
 
+    list(console, "Help", "Shows this help");
     list(console, "showosconfig", "Shows the current OS config");
     list(console, "dumpmem <offset> <size>",
          "Prints memory from offset <offset> for <size> bytes");
+    list(console, "disk", "Shows currently available disks");
+    list(console, "inserti <diskindex> <drivenumber>",
+         "Insert disk with number <diskindex> into drive <drivenumber>");
+    list(console, "insert <diskname> <drivenumber>",
+         "Insert disk with name <diskname> into drive <drivenumber>");
+
+    listSep(console, "", "");
 }
 
 static void processConsoleCommand(const std::string &line, GLConsole &console,
@@ -151,14 +175,13 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
     }
 
     if (tokens.views[0] == "showosconfig") {
-
         listConfig(console, oscfg);
     }
 
     if (tokens.views[0] == "dumpmem") {
         if (tokens.count == 3) {
-            int offset = atoi(tokens.views[1].str);
-            size_t sz = (size_t)atoi(tokens.views[2].str);
+            int offset = atol16(tokens.views[1].str);
+            size_t sz = (size_t)atol16(tokens.views[2].str);
 
             cHexdumpMainmem(console, offset, sz);
         }
@@ -174,37 +197,51 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
         } catch (...) {
             list(console, "Disk Directory does not exist", diskDir.c_str());
         }
+
+        listSep(console, "", "");
     }
 
     if (tokens.views[0] == "inserti") {
         try {
             FileListing listing(diskDir.c_str());
-            size_t fidx = (size_t)atoi(tokens.views[2].str);
 
-            if (fidx < listing.filenames.size()) {
-                int diskno = atoi(tokens.views[2].str);
-                std::string diskPath(diskDir + "/" + listing.filenames[diskno]);
+            if (tokens.count == 3) {
+                size_t fidx = (size_t)atoi(tokens.views[1].str);
 
-                list(console, "Load", listing.filenames[diskno].c_str(), 0);
+                if (fidx < listing.filenames.size()) {
+                    std::string diskPath(diskDir + "/" +
+                                         listing.filenames[fidx]);
 
-                LockGuard lg(globalMutex);
-                diskdrv_readyfdd(diskno, diskPath.c_str(), 0);
+                    list(console, "Load", listing.filenames[fidx].c_str(), 0);
+                    int driveNumber = atoi(tokens.views[2].str);
+
+                    LockGuard lg(globalMutex);
+                    diskdrv_readyfdd(driveNumber, diskPath.c_str(), 0);
+                }
             }
 
         } catch (...) {
             list(console, "No", "");
         }
+
+        listSep(console, "", "");
     }
 
     if (tokens.views[0] == "insert") {
         if (tokens.count == 3) {
-            int diskno = atoi(tokens.views[2].str);
             std::string diskName(tokens.views[1].str, tokens.views[1].sz);
             std::string diskPath = diskDir + "/" + diskName;
 
+            list(console, "Load", diskName.c_str(), 0);
+
+            int driveNumber = atoi(tokens.views[2].str);
+
             LockGuard lg(globalMutex);
-            diskdrv_readyfdd(diskno, diskPath.c_str(), 0);
+
+            diskdrv_readyfdd(driveNumber, diskPath.c_str(), 0);
         }
+
+        listSep(console, "", "");
     }
 }
 
@@ -220,7 +257,7 @@ ConsoleContext::ConsoleContext(
       font(getFont().c_str(), 64),
       fontContext{glyphCache.textGlyphMappingCache, glyphCache.imageIndexed,
                   font.freetypeFace, font.hbfont},
-      console(alc, fontContext, 80, device, physicalDevice, ua, sampler,
+      console(alc, fontContext, 132, device, physicalDevice, ua, sampler,
               layouts, glyphCache.alphaTexture.textureView),
       diskDir(diskDir), oscfg(oscfg), globalMutex(globalMutex)
 

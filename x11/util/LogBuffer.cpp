@@ -9,7 +9,7 @@ namespace BR {
 size_t LogBuffer::add(const char *ln) {
     const size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
 
-    LineColor<80> newLine;
+    LineColor<132> newLine;
     newLine << FormatString{ln, 0};
 
     newLine.print();
@@ -20,7 +20,7 @@ size_t LogBuffer::add(const char *ln) {
     return cur;
 }
 
-size_t LogBuffer::add(const LineColor<80> &lineColor) {
+size_t LogBuffer::add(const LineColor<132> &lineColor) {
     const size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
 
     lines[next] = lineColor;
@@ -29,7 +29,7 @@ size_t LogBuffer::add(const LineColor<80> &lineColor) {
     return cur;
 }
 
-LineColor<80> *LogBuffer::get(size_t which) {
+LineColor<132> *LogBuffer::get(size_t which) {
     which %= arraySize(lines);
 
     if (which > cur) {
@@ -39,7 +39,7 @@ LineColor<80> *LogBuffer::get(size_t which) {
     }
 }
 
-void LogBuffer::addColor(size_t which, uint8_t (&nColors)[80]) {
+void LogBuffer::addColor(size_t which, uint8_t (&nColors)[132]) {
     memcpy(lines[which].colors, nColors, sizeof(lines[which].colors));
 }
 } // namespace BR

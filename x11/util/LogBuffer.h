@@ -10,13 +10,13 @@ namespace BR {
 
 class LogBuffer {
   public:
-    LineColor<80> lines[1000]{};
+    LineColor<132> lines[1000]{};
     size_t cur = 0;
 
     size_t add(const char *ln);
-    size_t add(const LineColor<80> &lineColor);
-    LineColor<80> *get(size_t which);
-    void addColor(size_t which, uint8_t (&nColors)[80]);
+    size_t add(const LineColor<132> &lineColor);
+    LineColor<132> *get(size_t which);
+    void addColor(size_t which, uint8_t (&nColors)[132]);
 };
 
 } // namespace BR

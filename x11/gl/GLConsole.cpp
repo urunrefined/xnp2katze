@@ -115,7 +115,7 @@ void GLConsole::addLine(const std::string &line) {
     logBuffer.add(line.c_str());
 }
 
-void GLConsole::addLine(const LineColor<80> &lineColor) {
+void GLConsole::addLine(const LineColor<132> &lineColor) {
     logBuffer.add(lineColor);
 }
 
@@ -162,9 +162,9 @@ void GLConsole::ready() {
                                 fontContext.freetypeFace);
 
         {
-            Vec3 vec[80]{};
+            Vec3 vec[132]{};
 
-            for (size_t c = 0; c < 80; c++) {
+            for (size_t c = 0; c < 132; c++) {
                 vec[c] = palette.colors[line->colors[c]];
             }
 
