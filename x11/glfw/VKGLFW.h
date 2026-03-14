@@ -54,6 +54,9 @@ class GLFWSurface {
 
     GLFWwindow *window;
 
+    bool isFocused = false;
+    bool shouldCapture = false;
+
     GLFWSurface(uint32_t width_, uint32_t height_, const char *windowName);
     ~GLFWSurface();
 

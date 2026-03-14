@@ -84,8 +84,10 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
     VulkanInstance instance(extensions, layers);
     VulkanDebugCallback callback(instance, vkdebug);
 
-    auto firstWindow =
-        std::make_unique<VulkanWindowContext>(instance, 640, 480, "XNP2Katze-Main");
+    auto firstWindow = std::make_unique<VulkanWindowContext>(instance, 640, 480,
+                                                             "XNP2Katze-Main");
+
+    firstWindow->glfwSurface.shouldCapture = true;
 
     VulkanPhysicalDevice physicalDevice =
         glPhysicalDeviceSelection(instance, firstWindow->vulkanSurface);
@@ -120,8 +122,8 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
     VulkanRenderPass renderPass(device, surfaceFormat.format, renderDepthFormat,
                                 ShouldPresent::YES);
 
-    auto secondWindow =
-        std::make_unique<VulkanWindowContext>(instance, 640, 480, "XNP2Katze-Console");
+    auto secondWindow = std::make_unique<VulkanWindowContext>(
+        instance, 640, 480, "XNP2Katze-Console");
 
     contexts.emplace_back(std::make_unique<ConsoleContext>(
         device, physicalDevice, std::move(secondWindow), sampler, layouts,

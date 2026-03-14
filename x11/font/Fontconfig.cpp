@@ -95,7 +95,7 @@ std::vector<std::string>
 FontList::getFontList(const std::vector<const char *> &requestedLangs) {
     std::vector<std::string> ret;
 
-//    print();
+    //    print();
 
     for (int i = 0; i < fs->nfont; i++) {
         const FcPattern *font = fs->fonts[i];

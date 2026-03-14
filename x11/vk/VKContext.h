@@ -26,7 +26,8 @@ class VulkanWindowContext {
 
     VulkanWindowContext(VulkanInstance &instance, uint32_t sizeX,
                         uint32_t sizeY, const char *windowName)
-        : glfwSurface(sizeX, sizeY, windowName), vulkanSurface(glfwSurface, instance) {}
+        : glfwSurface(sizeX, sizeY, windowName),
+          vulkanSurface(glfwSurface, instance) {}
 };
 
 class VulkanRenderContext {

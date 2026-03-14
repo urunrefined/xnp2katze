@@ -11,8 +11,6 @@
 
 namespace BR {
 
-static bool isFocused = false;
-
 static void onWindowResized(GLFWwindow *window, unsigned int width,
                             unsigned int height) {
     GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
@@ -154,9 +152,6 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
     (void)window;
     (void)mods;
 
-    if (!isFocused)
-        return;
-
     GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     GLFWInput &input = ctx->getInput();
 
@@ -173,7 +168,6 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
         if (key == GLFW_KEY_F12) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            isFocused = false;
         }
 
         if (key == GLFW_KEY_F4 && mods == GLFW_MOD_ALT) {
@@ -210,17 +204,28 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 static void mouse_move_callback(GLFWwindow *window, double x, double y) {
     (void)window;
 
-    if (!isFocused)
-        return;
-
     GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
-    input.moveMouse((float)x, (float)y);
+    //    printf("Mouse x %f, y %f\n", x, y);
 
-    // printf("update mouse raw %u %u\n", ix, iy);
+    if (ctx->shouldCapture) {
+        if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+            input.moveMouse((float)x, (float)y);
+            glfwSetCursorPos(window, 0, 0);
+        } else {
+            // Ignore any mouse movement on a window which should be captured,
+            // but the user has not specifically clicked into. Even a window
+            // which has focus should not do anything here
+        }
+    } else {
+        input.moveMouse((float)x, (float)y);
+    }
+}
 
-    glfwSetCursorPos(window, 0, 0);
+static void window_focus_callback(GLFWwindow *window, int focused) {
+    GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
+    ctx->isFocused = focused ? true : false;
 }
 
 static void mouse_button_callback(GLFWwindow *window, int button, int action,
@@ -230,27 +235,28 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action,
     GLFWSurface *ctx = (GLFWSurface *)glfwGetWindowUserPointer(window);
     Input &input = ctx->getInput();
 
-    if (isFocused) {
-
-        if (action == GLFW_PRESS) {
-            for (const MouseMapping &buttonPair : mousemap) {
-                if (buttonPair.glfwKey == button) {
-                    input.pressButton(buttonPair.inputKey);
-                    break;
-                }
-            }
-        } else if (action == GLFW_RELEASE) {
-            for (const MouseMapping &buttonPair : mousemap) {
-                if (buttonPair.glfwKey == button) {
-                    input.letgoButton(buttonPair.inputKey);
-                    break;
-                }
+    if (action == GLFW_PRESS) {
+        if (ctx->shouldCapture) {
+            if (glfwGetInputMode(window, GLFW_CURSOR) != GLFW_CURSOR_DISABLED) {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                // Discard the first click event if the window isn't currently
+                // capturing
+                return;
             }
         }
-    } else {
-        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            isFocused = true;
+
+        for (const MouseMapping &buttonPair : mousemap) {
+            if (buttonPair.glfwKey == button) {
+                input.pressButton(buttonPair.inputKey);
+                break;
+            }
+        }
+    } else if (action == GLFW_RELEASE) {
+        for (const MouseMapping &buttonPair : mousemap) {
+            if (buttonPair.glfwKey == button) {
+                input.letgoButton(buttonPair.inputKey);
+                break;
+            }
         }
     }
 }
@@ -285,7 +291,8 @@ GLFWContext::GLFWContext() {
 
 GLFWContext::~GLFWContext() { glfwTerminate(); }
 
-GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight, const char *windowName)
+GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight,
+                         const char *windowName)
     : currentWidth(surfaceWidth), currentHeight(surfaceHeight) {
 
     assert((int)surfaceHeight > 0);
@@ -299,13 +306,13 @@ GLFWSurface::GLFWSurface(uint32_t surfaceWidth, uint32_t surfaceHeight, const ch
     }
 
     glfwSetWindowUserPointer(window, this);
-
     glfwSetWindowSizeCallback(window, onWindowResized);
     glfwSetCursorPosCallback(window, mouse_move_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCharCallback(window, charCallback);
+    glfwSetWindowFocusCallback(window, window_focus_callback);
 
     onWindowResized(window, surfaceWidth, surfaceHeight);
 
