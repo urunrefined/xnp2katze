@@ -70,14 +70,13 @@ void loop(SignalFD &sfd, InputMapper &inputMapper, NP2CFG &cfg, NP2OSCFG &oscfg,
     (void)oscfg;
     (void)diskDir;
 
-    vkdebug = 1;
-
     GLFWContext glfwContext;
 
     auto extensions = getRequiredGLFWExtensions();
     std::vector<const char *> layers;
 
     if (vkdebug) {
+        printf("Vulkan debugging will be turned on\n");
         extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
         layers.push_back(validationLayerString);
     }

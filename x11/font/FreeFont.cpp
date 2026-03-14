@@ -247,9 +247,10 @@ std::string getFont() {
 
     std::vector<std::string> fontFiles = fontlist.getFontList({});
 
+    /*
     for (auto &str : fontFiles) {
         printf("--%s--\n", str.c_str());
-    }
+    }*/
 
     if (fontFiles.empty()) {
         return "";

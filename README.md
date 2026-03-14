@@ -11,7 +11,8 @@ Install the following packages
 glslang (for glslangValidator glsl -> spirv compiler)
 glfw for window creation
 fontconfig, harfbuzz, freetype for rendering fonts
-Simply call "make".
+Simply call "make". Use "RELEASE=1 make" to disable
+some of the logs and turn on optimizations
 
 Running:
 To run you need:

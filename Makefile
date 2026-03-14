@@ -4,8 +4,17 @@ INCEXT=-I/usr/include/fontconfig -I/usr/include/freetype2 -I/usr/include/harfbuz
 LDLIBS = -pthread -lasound -lm -lglfw -lvulkan -lfontconfig -lharfbuzz -lfreetype -lpulse
 
 #General flags
-CXXFLAGS = -Wall -Wextra -std=gnu++17 -pthread -DNDEBUG -fsigned-char -fno-strict-aliasing -g -O2
-CFLAGS   = -Wall -Wextra -std=gnu99   -pthread -DNDEBUG -fsigned-char -fno-strict-aliasing -g -O2
+
+CXXFLAGS = -Wall -Wextra -std=gnu++17 -pthread -fsigned-char -fno-strict-aliasing
+CFLAGS =   -Wall -Wextra -std=gnu99   -pthread -fsigned-char -fno-strict-aliasing
+
+ifeq ($(RELEASE),1)
+    CXXFLAGS += -O2 -g
+    CFLAGS += -O2 -g
+else
+    CXXFLAGS = -DVKDEBUG=1 -DNDEBUG -Og -g
+    CFLAGS = -DVKDEBUG=1 -DNDEBUG -Og -g
+endif
 
 SRC_C = \
 		x11/np2.c                                      \
@@ -286,10 +295,7 @@ SRC_CPP = \
 
 		
 
-ifeq ($(VKDEBUG),1)
-    CXXFLAGS += -DVKDEBUG=1
-    CFLAGS += -DVKDEBUG=1
-endif
+
 
 OBJ = $(SRC_C:.c=.o) $(SRC_CPP:.cpp=.o)
 DEP = $(SRC_C:.c=.d) $(SRC_CPP:.cpp=.d)
