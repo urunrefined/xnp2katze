@@ -147,7 +147,7 @@ static void listConfig(GLConsole &console, const NP2OSCFG &oscfg) {
 static void printHelp(GLConsole &console) {
     listSep(console, " --- ", "Help");
 
-    list(console, "Help", "Shows this help");
+    list(console, "help", "Shows this help");
     list(console, "showosconfig", "Shows the current OS config");
     list(console, "dumpmem <offset> <size>",
          "Prints memory from offset <offset> for <size> bytes");
@@ -221,7 +221,7 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
             }
 
         } catch (...) {
-            list(console, "No", "");
+            list(console, "Could not create directory listing", "");
         }
 
         listSep(console, "", "");

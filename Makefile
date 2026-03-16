@@ -9,11 +9,11 @@ CXXFLAGS = -Wall -Wextra -std=gnu++17 -pthread -fsigned-char -fno-strict-aliasin
 CFLAGS =   -Wall -Wextra -std=gnu99   -pthread -fsigned-char -fno-strict-aliasing
 
 ifeq ($(RELEASE),1)
-    CXXFLAGS += -O2 -g
-    CFLAGS += -O2 -g
+    CXXFLAGS += -O2 -g -DNDEBUG
+    CFLAGS += -O2 -g -DNDEBUG
 else
-    CXXFLAGS = -DVKDEBUG=1 -DNDEBUG -Og -g
-    CFLAGS = -DVKDEBUG=1 -DNDEBUG -Og -g
+    CXXFLAGS += -DVKDEBUG=1 -Og -g
+    CFLAGS += -DVKDEBUG=1 -Og -g
 endif
 
 SRC_C = \

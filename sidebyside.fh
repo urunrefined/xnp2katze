@@ -26,21 +26,13 @@ if [ $retries -eq 0 ]
 	exit 1
 end
 
-set windowMain $(xdotool search -name XNP2Katze-main)
-set windowConsole $(xdotool search -name XNP2Katze-console)
-
 echo "windowMain: $windowMain; windowConsole: $windowConsole"
 
-set screenSizeX 3840
-set screenSizeY 2160
-
-set halfScreenSizeX $(math "$screenSizeX / 2")
-
 xdotool windowmove $windowMain 0 0
-xdotool windowsize $windowMain $halfScreenSizeX $screenSizeY
+xdotool windowsize $windowMain 50% 100%
 
-xdotool windowmove $windowConsole $halfScreenSizeX 0
-xdotool windowsize $windowConsole $halfScreenSizeX $screenSizeY
+xdotool windowmove $windowConsole 50% 0
+xdotool windowsize $windowConsole 50% 100%
 
 xdotool windowraise $windowMain
 xdotool windowraise $windowConsole
