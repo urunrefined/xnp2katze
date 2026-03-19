@@ -43,6 +43,8 @@ class ConsoleContext : public MainContext {
     const std::string &diskDir;
     const NP2OSCFG &oscfg;
 
+    std::vector<uint8_t> ref;
+
     Mutex &globalMutex;
 
   public:

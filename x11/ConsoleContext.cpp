@@ -59,27 +59,54 @@ static void listComConfig(GLConsole &console, const COMCFG &cfg) {
 }
 
 static void printHex(GLConsole &console, size_t offset, size_t sz,
-                     const uint8_t *data) {
+                     const uint8_t *dataOffset0) {
     LineColor<132> lineColor;
 
-    lineColor << FormatHex16{(uint16_t)offset, 1};
+    lineColor << FormatHex32{(uint16_t)offset, 1};
     lineColor << FormatString{":  ", 2};
 
     for (size_t i = offset; i < offset + sz; i++) {
-        lineColor << FormatHex{data[i], 1};
+        lineColor << FormatHex{dataOffset0[i], 1};
         lineColor << FormatString{" ", 0};
     }
-    
+
     lineColor << FormatString{"  ", 0};
-    
+
     for (size_t i = offset; i < offset + sz; i++) {
-        uint8_t ch = data[i];
-    
+        uint8_t ch = dataOffset0[i];
+
         if (isprint(ch)) {
             lineColor << FormatPrintChar{ch, 0};
-        }
-        else {
+        } else {
             lineColor << FormatPrintChar{'.', 0};
+        }
+    }
+
+    console.addLine(lineColor);
+}
+
+static void printSpecialLine(GLConsole &console, size_t offset,
+                             uint8_t (&colors)[16],
+                             const uint8_t *dataAdjusted) {
+    LineColor<132> lineColor;
+
+    lineColor << FormatHex32{(uint16_t)offset, 1};
+    lineColor << FormatString{":  ", 2};
+
+    for (size_t i = 0; i < 16; i++) {
+        lineColor << FormatHex{dataAdjusted[i], colors[i]};
+        lineColor << FormatString{" ", 0};
+    }
+
+    lineColor << FormatString{"  ", 0};
+
+    for (size_t i = 0; i < 16; i++) {
+        uint8_t ch = dataAdjusted[i];
+
+        if (isprint(ch)) {
+            lineColor << FormatPrintChar{ch, colors[i]};
+        } else {
+            lineColor << FormatPrintChar{'.', colors[i]};
         }
     }
 
@@ -156,6 +183,11 @@ static void printHelp(GLConsole &console) {
          "Insert disk with number <diskindex> into drive <drivenumber>");
     list(console, "insert <diskname> <drivenumber>",
          "Insert disk with name <diskname> into drive <drivenumber>");
+    list(console, "ref",
+         "Save a reference snapshot of the current system memory");
+    list(console, "cmp", "Compare saved reference with current system memory");
+    list(console, "pokeb <offset> <byte>",
+         "Put <byte> into <offset> system memory");
 
     listSep(console, "", "");
 }
@@ -163,6 +195,7 @@ static void printHelp(GLConsole &console) {
 static void processConsoleCommand(const std::string &line, GLConsole &console,
                                   const NP2OSCFG &oscfg,
                                   const std::string &diskDir,
+                                  std::vector<uint8_t> &ref,
                                   Mutex &globalMutex) {
 
     auto tokens = split(line.c_str());
@@ -243,6 +276,73 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
 
         listSep(console, "", "");
     }
+
+    if (tokens.views[0] == "ref") {
+        ref.clear();
+        ref.insert(ref.begin(), mem, mem + 0x200000);
+        list(console, "OK", "");
+    }
+
+    if (tokens.views[0] == "cmp") {
+        if (ref.size() != 0x200000) {
+            list(console, "No reference", "");
+            return;
+        }
+
+        std::vector<uint8_t> cur;
+        cur.insert(cur.begin(), mem, mem + 0x200000);
+
+        // printf("%zu %zu\n", cur.size(), ref.size());
+
+        listSep(console, "--", "Begin compare");
+
+        for (size_t i = 0; i < 0x200000; i += 16) {
+            uint8_t colors[16]{};
+            bool hit = false;
+
+            for (size_t j = 0; j < 16; j++) {
+                if (cur[i + j] != ref[i + j]) {
+                    colors[j] = 2;
+                    hit = true;
+                }
+            }
+
+            if (hit) {
+                printSpecialLine(console, i, colors, ref.data() + i);
+                printSpecialLine(console, i, colors, cur.data() + i);
+                list(console, "", "");
+            }
+        }
+
+        listSep(console, "--", "End compare");
+    }
+
+    if (tokens.views[0] == "pokeb") {
+        if (tokens.count == 3) {
+            size_t offset = (size_t)atol16(tokens.views[1].str);
+            uint8_t byte = (uint8_t)atol16(tokens.views[2].str);
+
+            if (offset >= 0x200000) {
+                return;
+            }
+
+            mem[offset] = byte;
+
+            LineColor<132> lineColor;
+            lineColor << FormatString{"Set offset ", 0}
+                      << FormatHex32{(uint32_t)offset, 1}
+                      << FormatString{" to ", 0} << FormatHex{byte, 1};
+
+            console.addLine(lineColor);
+
+            //            list(console, "--", "End compare");
+        }
+    }
+
+    if (tokens.views[0] == "drop") {
+        ref.clear();
+        list(console, "OK", "");
+    }
 }
 
 ConsoleContext::ConsoleContext(
@@ -259,9 +359,7 @@ ConsoleContext::ConsoleContext(
                   font.freetypeFace, font.hbfont},
       console(alc, fontContext, 132, device, physicalDevice, ua, sampler,
               layouts, glyphCache.alphaTexture.textureView),
-      diskDir(diskDir), oscfg(oscfg), globalMutex(globalMutex)
-
-{
+      diskDir(diskDir), oscfg(oscfg), globalMutex(globalMutex) {
     cmbBuffers.push_back(&vtx);
     cmbBuffers.push_back(&uniformBuffer);
 
@@ -303,7 +401,7 @@ void ConsoleContext::work() {
             auto utf8 = getUTF8FromUnicode(console.codePoints);
 
             if (utf8) {
-                processConsoleCommand(*utf8, console, oscfg, diskDir,
+                processConsoleCommand(*utf8, console, oscfg, diskDir, ref,
                                       globalMutex);
             }
 
