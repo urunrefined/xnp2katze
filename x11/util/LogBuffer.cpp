@@ -10,7 +10,7 @@ size_t LogBuffer::add(const char *ln) {
     const size_t next = (cur + 1) % ((sizeof(lines) / sizeof(lines[0])));
 
     LineColor<132> newLine;
-    newLine << FormatString{ln, 0};
+    newLine << FormatString{ln, ConsoleColor::WHITE};
 
     newLine.print();
 

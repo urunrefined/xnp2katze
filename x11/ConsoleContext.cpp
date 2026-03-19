@@ -19,8 +19,8 @@ static void list(GLConsole &console, const char *str, UINT32 val,
                  UINT32 offset = 0) {
     LineColor<132> lineColor;
 
-    lineColor << FormatString{str, 0} << FormatPad{36 + offset, 0}
-              << FormatSize{val, 2};
+    lineColor << FormatString{str, ConsoleColor::WHITE}
+              << FormatPad{36 + offset} << FormatSize{val, ConsoleColor::RED};
 
     console.addLine(lineColor);
 }
@@ -28,8 +28,8 @@ static void list(GLConsole &console, const char *str, UINT32 val,
 static void listIdx(GLConsole &console, size_t idx, const char *str) {
     LineColor<132> lineColor;
 
-    lineColor << FormatSize{idx, 0} << FormatString{": ", 2} << FormatPad{8, 0}
-              << FormatString{str, 0};
+    lineColor << FormatSize{idx} << FormatString{": ", ConsoleColor::RED}
+              << FormatPad{8} << FormatString{str};
 
     console.addLine(lineColor);
 }
@@ -37,8 +37,8 @@ static void listIdx(GLConsole &console, size_t idx, const char *str) {
 static void listSep(GLConsole &console, const char *sentinel, const char *str) {
     LineColor<132> lineColor;
 
-    lineColor << FormatString{sentinel, 0} << FormatString{str, 1}
-              << FormatString{sentinel, 0};
+    lineColor << FormatString{sentinel} << FormatString{str, ConsoleColor::BLUE}
+              << FormatString{sentinel};
 
     console.addLine(lineColor);
 }
@@ -46,8 +46,8 @@ static void listSep(GLConsole &console, const char *sentinel, const char *str) {
 static void list(GLConsole &console, const char *str, const char *val,
                  UINT32 offset = 0) {
     LineColor<132> lineColor;
-    lineColor << FormatString{str, 0} << FormatPad{36 + offset, 0}
-              << FormatString{val, 2};
+    lineColor << FormatString{str} << FormatPad{36 + offset}
+              << FormatString{val, ConsoleColor::RED};
 
     console.addLine(lineColor);
 }
@@ -62,23 +62,23 @@ static void printHex(GLConsole &console, size_t offset, size_t sz,
                      const uint8_t *dataOffset0) {
     LineColor<132> lineColor;
 
-    lineColor << FormatHex32{(uint16_t)offset, 1};
-    lineColor << FormatString{":  ", 2};
+    lineColor << FormatHex32{(uint32_t)offset, ConsoleColor::BLUE};
+    lineColor << FormatString{":  ", ConsoleColor::RED};
 
     for (size_t i = offset; i < offset + sz; i++) {
-        lineColor << FormatHex{dataOffset0[i], 1};
-        lineColor << FormatString{" ", 0};
+        lineColor << FormatHex{dataOffset0[i]};
+        lineColor << FormatString{" "};
     }
 
-    lineColor << FormatString{"  ", 0};
+    lineColor << FormatString{"  "};
 
     for (size_t i = offset; i < offset + sz; i++) {
         uint8_t ch = dataOffset0[i];
 
         if (isprint(ch)) {
-            lineColor << FormatPrintChar{ch, 0};
+            lineColor << FormatPrintChar{ch};
         } else {
-            lineColor << FormatPrintChar{'.', 0};
+            lineColor << FormatPrintChar{'.'};
         }
     }
 
@@ -86,19 +86,19 @@ static void printHex(GLConsole &console, size_t offset, size_t sz,
 }
 
 static void printSpecialLine(GLConsole &console, size_t offset,
-                             uint8_t (&colors)[16],
+                             ConsoleColor (&colors)[16],
                              const uint8_t *dataAdjusted) {
     LineColor<132> lineColor;
 
-    lineColor << FormatHex32{(uint16_t)offset, 1};
-    lineColor << FormatString{":  ", 2};
+    lineColor << FormatHex32{(uint32_t)offset, ConsoleColor::BLUE};
+    lineColor << FormatString{":  ", ConsoleColor::RED};
 
     for (size_t i = 0; i < 16; i++) {
         lineColor << FormatHex{dataAdjusted[i], colors[i]};
-        lineColor << FormatString{" ", 0};
+        lineColor << FormatString{" "};
     }
 
-    lineColor << FormatString{"  ", 0};
+    lineColor << FormatString{"  "};
 
     for (size_t i = 0; i < 16; i++) {
         uint8_t ch = dataAdjusted[i];
@@ -297,12 +297,12 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
         listSep(console, "--", "Begin compare");
 
         for (size_t i = 0; i < 0x200000; i += 16) {
-            uint8_t colors[16]{};
+            ConsoleColor colors[16]{};
             bool hit = false;
 
             for (size_t j = 0; j < 16; j++) {
                 if (cur[i + j] != ref[i + j]) {
-                    colors[j] = 2;
+                    colors[j] = ConsoleColor::RED;
                     hit = true;
                 }
             }
@@ -329,9 +329,10 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
             mem[offset] = byte;
 
             LineColor<132> lineColor;
-            lineColor << FormatString{"Set offset ", 0}
-                      << FormatHex32{(uint32_t)offset, 1}
-                      << FormatString{" to ", 0} << FormatHex{byte, 1};
+            lineColor << FormatString{"Set offset "}
+                      << FormatHex32{(uint32_t)offset, ConsoleColor::BLUE}
+                      << FormatString{" to "}
+                      << FormatHex{byte, ConsoleColor::BLUE};
 
             console.addLine(lineColor);
 

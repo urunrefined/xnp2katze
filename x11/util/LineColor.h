@@ -7,49 +7,55 @@
 
 namespace BR {
 
+enum ConsoleColor {
+    WHITE = 0,
+    BLUE = 1,
+    RED = 2,
+};
+
 struct FormatString {
     const char *text;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatPad {
     size_t padLeft;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatInt {
     int i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatUInt {
     unsigned int i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatSize {
     size_t i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatHex {
     uint8_t i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatHex16 {
     uint16_t i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatHex32 {
     uint32_t i;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 struct FormatPrintChar {
     uint8_t ch;
-    uint8_t color;
+    ConsoleColor color = ConsoleColor::WHITE;
 };
 
 template <size_t N> struct LineColor {
@@ -134,8 +140,8 @@ template <size_t N> struct LineColor {
     LineColor &operator<<(const FormatHex32 &formatHex) {
         char buf[128];
 
-        snprintf(buf, sizeof(buf), "%.8hx", formatHex.i);
-
+        snprintf(buf, sizeof(buf), "%.8x", formatHex.i);
+        
         return (*this) << FormatString{buf, formatHex.color};
     }
 

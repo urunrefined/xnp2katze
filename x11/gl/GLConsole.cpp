@@ -55,9 +55,9 @@ GLConsole::GLConsole(DataAllocator &dataAllocator, FontContext &fontContext,
 
     float curY = marginBottomTop;
 
-    palette.colors[0] = {1, 1, 1};
-    palette.colors[1] = {0.2, 0.4, 1};
-    palette.colors[2] = {0.7, 0.2, 0.1};
+    palette.colors[ConsoleColor::WHITE] = {1, 1, 1};
+    palette.colors[ConsoleColor::BLUE] = {0.2, 0.4, 1};
+    palette.colors[ConsoleColor::RED] = {0.7, 0.2, 0.1};
 
     {
         auto mat = Matrix4x4f::ident();
