@@ -188,6 +188,15 @@ static void printHelp(GLConsole &console) {
     list(console, "cmp", "Compare saved reference with current system memory");
     list(console, "pokeb <offset> <byte>",
          "Put <byte> into <offset> system memory");
+    list(console, "pokew <offset> <word>",
+         "Put <word> into <offset> system memory");
+    list(console, "pokedw <offset> <dword>",
+         "Put <dword> into <offset> system memory");
+    list(console, "pokecs <offset> <string>",
+         "Put <string> with a 0 byte after each character into <offset> system "
+         "memory");
+    list(console, "pokes <offset> <string>",
+         "Put <string> into <offset> system memory");
 
     listSep(console, "", "");
 }
@@ -335,8 +344,97 @@ static void processConsoleCommand(const std::string &line, GLConsole &console,
                       << FormatHex{byte, ConsoleColor::BLUE};
 
             console.addLine(lineColor);
+        }
+    }
 
-            //            list(console, "--", "End compare");
+    if (tokens.views[0] == "pokew") {
+        if (tokens.count == 3) {
+            size_t offset = (size_t)atol16(tokens.views[1].str);
+            uint16_t word = (uint16_t)atol16(tokens.views[2].str);
+
+            if (offset + 1 >= 0x200000) {
+                return;
+            }
+
+            mem[offset] = word & 0xff;
+            mem[offset + 1] = (word >> 8) & 0xff;
+
+            LineColor<132> lineColor;
+            lineColor << FormatString{"Set offset "}
+                      << FormatHex32{(uint32_t)offset, ConsoleColor::BLUE}
+                      << FormatString{" to "}
+                      << FormatHex16{word, ConsoleColor::BLUE};
+
+            console.addLine(lineColor);
+        }
+    }
+
+    if (tokens.views[0] == "pokedw") {
+        if (tokens.count == 3) {
+            size_t offset = (size_t)atol16(tokens.views[1].str);
+            uint32_t dword = (uint32_t)atol16(tokens.views[2].str);
+
+            if (offset + 3 >= 0x200000) {
+                return;
+            }
+
+            mem[offset] = dword & 0xff;
+            mem[offset + 1] = (dword >> 8) & 0xff;
+            mem[offset + 2] = (dword >> 16) & 0xff;
+            mem[offset + 3] = (dword >> 24) & 0xff;
+
+            LineColor<132> lineColor;
+            lineColor << FormatString{"Set offset "}
+                      << FormatHex32{(uint32_t)offset, ConsoleColor::BLUE}
+                      << FormatString{" to "}
+                      << FormatHex32{dword, ConsoleColor::BLUE};
+
+            console.addLine(lineColor);
+        }
+    }
+
+    if (tokens.views[0] == "pokes") {
+        if (tokens.count == 3) {
+            size_t offset = (size_t)atol16(tokens.views[1].str);
+
+            StringView &strView = tokens.views[2];
+
+            if (offset + strView.sz >= 0x200000) {
+                return;
+            }
+
+            for (size_t i = 0; i < strView.sz; i++) {
+                mem[offset + i] = strView.str[i];
+            }
+
+            list(console, "OK", "");
+        }
+    }
+
+    if (tokens.views[0] == "pokecs") {
+        if (tokens.count == 3) {
+            size_t offset = (size_t)atol16(tokens.views[1].str);
+
+            StringView &strView = tokens.views[2];
+
+            size_t dosConsoleStrSize = strView.sz * 2;
+
+            if (offset + dosConsoleStrSize >= 0x200000) {
+                return;
+            }
+
+            uint8_t dosConsoleStr[dosConsoleStrSize];
+
+            for (size_t i = 0; i < strView.sz; i++) {
+                dosConsoleStr[i * 2] = strView.str[i];
+                dosConsoleStr[i * 2 + 1] = 0;
+            }
+
+            for (size_t i = 0; i < dosConsoleStrSize; i++) {
+                mem[offset + i] = dosConsoleStr[i];
+            }
+
+            list(console, "OK", "");
         }
     }
 

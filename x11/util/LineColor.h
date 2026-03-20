@@ -141,7 +141,7 @@ template <size_t N> struct LineColor {
         char buf[128];
 
         snprintf(buf, sizeof(buf), "%.8x", formatHex.i);
-        
+
         return (*this) << FormatString{buf, formatHex.color};
     }
 
